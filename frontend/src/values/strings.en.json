@@ -1,0 +1,9 @@
+{
+  "incorrect": {
+    "password": "Password (length not less than 8) should contains uppercase, numbers and any of @$!%_*#?&",
+    "repeated_password": "Passwords doesn't match",
+    "email": "Incorrect email address",
+    "phone": "Incorrect phone number. Format: +xxxxxx...",
+    "username": "Username (length not less than 5) should contains only letters, numbers and _ (optional)"
+  }
+}

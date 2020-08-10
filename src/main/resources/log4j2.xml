@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Configuration strict="true" xmlns="http://logging.apache.org/log4j/2.0/config">
+    <Appenders>
+        <Appender name="console" type="Console">
+            <Layout type="PatternLayout"
+                    pattern="Root log: %d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n" />
+        </Appender>
+    </Appenders>
+    <Loggers>
+        <Root level="debug">
+            <AppenderRef ref="console" />
+        </Root>
+    </Loggers>
+</Configuration>
