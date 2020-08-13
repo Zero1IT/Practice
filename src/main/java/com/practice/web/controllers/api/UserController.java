@@ -1,7 +1,7 @@
 package com.practice.web.controllers.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.practice.business.repository.jdbc.JdbcUserRepository;
+import com.practice.theater.repository.jdbc.JdbcUserRepository;
 import com.practice.web.context.WebController;
 import com.practice.web.controllers.Controller;
 

@@ -1,52 +1,27 @@
 package com.practice.web.dto;
 
-import com.practice.business.models.Role;
+import com.practice.theater.models.Role;
 
 public class JwtPayload {
-    private long id;
-    private String username;
-    private String email;
-    private String phone;
+    private long userId;
     private Role role;
 
-    public JwtPayload(long id, CredentialsDto dto) {
-        this.id = id;
-        username = dto.getUsername();
-        email = dto.getEmail();
-        phone = dto.getPhone();
+    public JwtPayload(long userId, CredentialsDto dto) {
+        this.userId = userId;
         role = dto.getRole();
     }
 
-    public long getId() {
-        return id;
+    public JwtPayload(long userId, Role role) {
+        this.userId = userId;
+        this.role = role;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public long getUserId() {
+        return userId;
     }
 
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
+    public void setUserId(long userId) {
+        this.userId = userId;
     }
 
     public Role getRole() {

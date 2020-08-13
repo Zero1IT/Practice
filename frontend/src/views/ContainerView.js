@@ -1,22 +1,15 @@
 import {View} from "./View";
-import {Observable} from "../models/observable/Observable";
 
 export class ContainerView extends View {
 
     /**
      * @param {HTMLElement|View} parent - content container
-     * @param model {Observable} - observable model with user information
      */
-    constructor(parent = null, model) {
-        super(parent, model);
-        model.subscribe(this);
+    constructor(parent = null) {
+        super(parent);
     }
 
-    async notify(model) {
-        console.log(model); // TODO: update view
-    }
-
-    render() {
+    async render() {
         return super._render(`
         <div class="header-menu">
             <div class="status"></div>

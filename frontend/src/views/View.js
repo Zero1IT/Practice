@@ -1,7 +1,7 @@
 /**
  * All view must be override all methods
  */
-import {ViewEvent} from "../controllers/ViewEvent";
+import {Controller} from "../controllers/Controller";
 
 export class View {
 
@@ -14,7 +14,7 @@ export class View {
         this.parent = parent;
         this.model = model;
         /**
-         * @type {ViewEvent}
+         * @type {Controller}
          */
         this.handler = null;
         /**
@@ -26,15 +26,15 @@ export class View {
 
     /**
      * Method to override
-     * @return {HTMLElement} - content container
+     * @return {Promise<HTMLElement>} - content container
      */
-    render() {
+    async render() {
         throw new Error("Render wasn't override");
     }
 
     /**
      * Method to override, set event handler on view
-     * @param handler {ViewEvent}
+     * @param handler {Controller}
      */
     setHandler(handler) {
         this.handler = handler;

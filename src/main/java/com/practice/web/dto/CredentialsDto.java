@@ -1,6 +1,6 @@
 package com.practice.web.dto;
 
-import com.practice.business.models.Role;
+import com.practice.theater.models.Role;
 
 public class CredentialsDto {
     private String username;

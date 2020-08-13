@@ -1,5 +1,5 @@
 /**
- * Observer should implement async notify(model) method
+ * Observer should implement async observe(model) method
  */
 export class Observable {
 
@@ -29,7 +29,7 @@ export class Observable {
 
     notifyAll(model) {
         for (let subscriber of this.subscribers) {
-            subscriber.notify(model).catch(console.log); // TODO: error handler
+            subscriber.observe(model).catch(console.log); // TODO: error handler
         }
     }
 
@@ -54,10 +54,10 @@ export class Observable {
     }
 
     subscribe(observer) {
-        if (((typeof observer["notify"]) == "function")) {
+        if (((typeof observer["observe"]) == "function")) {
             this.subscribers.add(observer);
         } else {
-            throw new Error(`${observer} doesn't implement async notify(model) method`)
+            throw new Error(`${observer} doesn't implement async observe(model) method`)
         }
     }
 

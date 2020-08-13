@@ -13,7 +13,7 @@ class SignView extends View {
         super(parent, model);
     }
 
-    render() {
+    async render() {
         this._render(`
             <div class="login-wrap">
                 <div class="login-html">

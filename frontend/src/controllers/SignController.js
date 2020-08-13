@@ -1,10 +1,10 @@
-import {ViewEvent} from "./ViewEvent";
+import {Controller} from "./Controller";
 import {EVENT} from "../views/SignView";
 import {LoginDto} from "../models/dto/LoginDto";
 import {RegistrationDto} from "../models/dto/RegistrationDto";
 import {app} from "../app";
 
-export class SignController extends ViewEvent {
+export class SignController extends Controller {
 
     async handle(eventType, data) {
         switch (eventType) {
@@ -36,7 +36,7 @@ export class SignController extends ViewEvent {
         let response = await app.fetcher.jsonRequest("/registration", "POST", data.model.toJson());
         if (response.ok) {
             let json = await response.json();
-            app.acceptJwtToken(json.sign);
+            app.acceptJwtToken(json);
         } else {
             throw new Error(`${response.status}`);
         }

@@ -1,6 +1,6 @@
 package com.practice.web.validators;
 
-import com.practice.business.ServiceLocator;
+import com.practice.theater.ServiceLocator;
 import com.practice.web.dto.CredentialsDto;
 import org.junit.jupiter.api.Test;
 

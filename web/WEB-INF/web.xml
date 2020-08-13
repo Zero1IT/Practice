@@ -11,7 +11,7 @@
         <param-value>/resources/index.html</param-value>
     </context-param>
     <listener>
-        <listener-class>com.practice.web.context.ServletContextLoadListener</listener-class>
+        <listener-class>com.practice.web.ServletContextLoadListener</listener-class>
     </listener>
     <servlet>
         <servlet-name>dispatcher</servlet-name>

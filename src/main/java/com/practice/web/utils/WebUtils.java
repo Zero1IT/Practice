@@ -1,29 +1,38 @@
 package com.practice.web.utils;
 
-import com.practice.business.ServiceLocator;
-import io.jsonwebtoken.SignatureAlgorithm;
+import com.practice.theater.ServiceLocator;
+import com.practice.web.dto.JwtPayload;
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.crypto.SecretKey;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Properties;
+import java.security.Key;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public final class WebUtils {
 
     private static final Logger LOGGER = LogManager.getLogger(WebUtils.class);
     private static final Object lock = new Object();
     private static final String CLASS_PATH_DELIMITER = "/";
+    private static final String AUTH_HEADER_TYPE = "Bearer";
     private static String privateKey = null;
+
+    public static final String REFRESH_TOKEN_USER_ID = "user_id";
+    public static final String ACCESS_TOKEN = "access";
+    public static final String REFRESH_TOKEN = "refresh";
 
     public static void sendJsonResponse(HttpServletResponse response, String json) throws IOException {
         response.setContentType("application/json;charset=utf-8");
@@ -33,20 +42,53 @@ public final class WebUtils {
     }
 
     /**
-     * Hash string with specific algorithm
-     * @param algorithm - algorithm for do hash
-     * @param str - string for hashing
-     * @return hashed string
+     * Creates jwt tokens for access and refresh
+     * @param payload - payload for access token
+     * @return map with two keys (access , refresh)
      */
-    public static String hash(String algorithm, String str) {
+    public static Map<String, String> createJwtTokens(JwtPayload payload) {
+        Map<String, String> tokens = new HashMap<>();
+        Key key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(WebUtils.getSecretKey()));
+        String access = Jwts.builder()
+                .setExpiration(getExpirationDate(0, 1))
+                .setSubject(JsonUtils.toJson(payload).orElse(""))
+                .signWith(key)
+                .compact();
+        String refresh = Jwts.builder()
+                .claim(REFRESH_TOKEN_USER_ID, payload.getUserId())
+                .setExpiration(getExpirationDate(30, 0))
+                .signWith(key)
+                .compact();
+        tokens.put(ACCESS_TOKEN, access);
+        tokens.put(REFRESH_TOKEN, refresh);
+        return tokens;
+    }
+
+    public static Claims parseJwsPayload(String token) {
         try {
-            MessageDigest hasher = MessageDigest.getInstance(algorithm);
-            byte[] hash = hasher.digest(str.getBytes(StandardCharsets.UTF_8));
-            return new String(hash, StandardCharsets.UTF_8);
-        } catch (NoSuchAlgorithmException e) {
+            Jws<Claims> claims = Jwts.parserBuilder()
+                    .setSigningKey(Keys.hmacShaKeyFor(Decoders.BASE64.decode(WebUtils.getSecretKey())))
+                    .build()
+                    .parseClaimsJws(token);
+            return claims.getBody();
+        } catch (JwtException e) {
             LOGGER.error(e);
-            throw new IllegalArgumentException("Not found algorithm: " + algorithm);
+            return null;
         }
+    }
+
+    public static Date getExpirationDate(int days, int hours) {
+        Date date = new Date();
+        date.setTime(date.getTime() + TimeUnit.DAYS.toMillis(days) + TimeUnit.HOURS.toMillis(hours));
+        return date;
+    }
+
+    public static void updateAndSendJwsTokens(HttpServletResponse resp, JwtPayload payload) throws IOException {
+        Map<String, String> tokens = WebUtils.createJwtTokens(payload);
+        String json = JsonUtils.toJson(tokens).orElse("");
+        ServiceLocator.getInstance().getServiceFactory().tokenService()
+                .saveRefreshToken(payload.getUserId(), tokens.get("refresh"));
+        WebUtils.sendJsonResponse(resp, json);
     }
 
     public static String getSecretKey() {
@@ -61,10 +103,21 @@ public final class WebUtils {
                     createAndSaveKey(fileName, properties);
                 }
             } catch (IOException | URISyntaxException e) {
+                LOGGER.error(e);
                 throw new RuntimeException(e);
             }
         }
         return privateKey;
+    }
+
+    public static Optional<String> getAuthenticationHeader(HttpServletRequest request) {
+        String authorization = request.getHeader("Authorization");
+        if (authorization == null) {
+            authorization = request.getHeader("x-access-token");
+        } else if (authorization.startsWith(AUTH_HEADER_TYPE)) {
+            authorization = authorization.substring(AUTH_HEADER_TYPE.length());
+        }
+        return authorization != null ? Optional.of(authorization.trim()) : Optional.empty();
     }
 
     private static void createAndSaveKey(String fileName, Properties properties) throws IOException, URISyntaxException {
@@ -80,15 +133,6 @@ public final class WebUtils {
                 }
             }
         }
-    }
-
-    /**
-     * Hash string with SHA-256 algorithm
-     * @param str - string for hashing
-     * @return hashed string
-     */
-    public static String hash(String str) {
-        return hash("SHA-256", str);
     }
 
     private WebUtils() {}

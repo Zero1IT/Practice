@@ -11,7 +11,7 @@ export class ErrorView extends View {
         super(parent, model);
     }
 
-    render() {
+    async render() {
         return this._render(`<div id="notfound">
                 <div class="notfound">
                     <div class="notfound-code">

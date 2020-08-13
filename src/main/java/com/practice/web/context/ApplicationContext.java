@@ -1,5 +1,6 @@
 package com.practice.web.context;
 
+import com.practice.web.context.security.WebAuthorize;
 import com.practice.web.controllers.Controller;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -34,6 +35,8 @@ public class ApplicationContext {
     public static class Builder {
         private final ApplicationContext applicationContext;
         private final Set<Controller> controllers = new HashSet<>();
+        private WebAuthorize authorize;
+        private boolean autoResolve;
 
         public Builder() {
             applicationContext = new ApplicationContext();
@@ -49,16 +52,17 @@ public class ApplicationContext {
             return this;
         }
 
+        public Builder addAuthorization(WebAuthorize p) {
+            authorize = p;
+            return this;
+        }
+
         /**
-         * Creates router with added controllers
-         * @param autoResolve - auto handle if controller doesn't exists
+         * @param auto - auto handle if controller doesn't exists
          * @return this object {@link ApplicationContext.Builder}
          */
-        public Builder registerMapping(boolean autoResolve) {
-            applicationContext.mappingResolver = new Router(autoResolve);
-            for (Controller controller : controllers) {
-                applicationContext.mappingResolver.addMapping(controller);
-            }
+        public Builder autoResolveNotFound(boolean auto) {
+            autoResolve = auto;
             return this;
         }
 
@@ -67,6 +71,10 @@ public class ApplicationContext {
          * @return application context object {@link ApplicationContext}
          */
         public ApplicationContext build() {
+            applicationContext.mappingResolver = new Router(autoResolve, authorize);
+            for (Controller controller : controllers) {
+                applicationContext.mappingResolver.addMapping(controller);
+            }
             return applicationContext;
         }
     }
