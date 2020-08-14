@@ -2,7 +2,6 @@ package com.practice.web.context;
 
 import com.practice.web.context.security.Authorize;
 import com.practice.web.context.security.WebAuthorize;
-import com.practice.web.controllers.Controller;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -12,6 +11,8 @@ import java.io.IOException;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,7 +20,7 @@ public class Router implements RequestResolver {
 
     private static final Logger LOGGER = LogManager.getLogger(Router.class);
 
-    private final Map<String, Controller> handlers = new HashMap<>();
+    private final Map<String, Handler> handlers = new HashMap<>();
     private final boolean isAutoResolveNotFound;
     private final WebAuthorize auth;
 
@@ -36,10 +37,21 @@ public class Router implements RequestResolver {
     @Override
     public void resolve(HttpServletRequest req, HttpServletResponse resp) throws IOException, NotFoundRouteException {
         String methodType = req.getMethod();
-        String uri = req.getRequestURI();
-        Controller controller = handlers.get(uri);
+        String uri = removeEndSlash(req.getRequestURI());
+        String[] patternsSelected = handlers.keySet().stream()
+                .filter(uri::startsWith)
+                .toArray(String[]::new);
+        String pattern = null;
 
-        if (controller == null) {
+        if (patternsSelected.length > 1) {
+            pattern = Arrays.stream(patternsSelected)
+                    .max(Comparator.comparingInt(String::length))
+                    .orElse(null);
+        } else if (patternsSelected.length == 1) {
+            pattern = patternsSelected[0];
+        }
+
+        if (pattern == null) {
             if (isAutoResolveNotFound) {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND);
                 return;
@@ -47,8 +59,9 @@ public class Router implements RequestResolver {
             throw new NotFoundRouteException(uri);
         }
 
-        if (auth == null || checkAuthorizeAccess(req, resp, controller.getClass())) {
-            invokeMethod(req, resp, methodType, controller);
+        Handler handler = handlers.get(pattern);
+        if (auth == null || checkAuthorizeAccess(req, resp, handler.getControllerClass())) {
+            invokeMethod(handler, uri, methodType, req, resp);
         }
     }
 
@@ -64,15 +77,11 @@ public class Router implements RequestResolver {
         return true;
     }
 
-    private void invokeMethod(HttpServletRequest req, HttpServletResponse resp, String methodType, Controller controller) throws IOException {
+    private void invokeMethod(Handler handler, String url, String method, HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
-            Class<? extends Controller> cl = controller.getClass();
-            Method method = cl.getMethod(methodType.toLowerCase(), HttpServletRequest.class, HttpServletResponse.class);
-            if (checkAuthorizeAccess(req, resp, method)) {
-                method.invoke(controller, req, resp);
+            if (!handler.invoke(url, method, req, resp)) {
+                resp.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED, "http.method_not_implemented");
             }
-        } catch (NoSuchMethodException e) {
-            resp.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED, "http.method_not_implemented");
         } catch (InvocationTargetException e) {
             LOGGER.error(e.getCause());
             if (e.getCause() instanceof RequestException) {
@@ -87,16 +96,16 @@ public class Router implements RequestResolver {
     }
 
     @Override
-    public void addMapping(Controller controller) {
-        for (String s : ejectUrls(controller)) {
-            handlers.put(s, controller);
-        }
+    public void addMapping(Object controller) {
+        String controllerUrl = ejectControllerUrl(controller);
+        checkUrlFormat(controllerUrl);
+        handlers.put(controllerUrl, new Handler(controller));
     }
 
-    private String[] ejectUrls(Object controller) {
+    private String ejectControllerUrl(Object controller) {
         Class<?> cl = controller.getClass();
         WebController annotation = cl.getAnnotation(WebController.class);
-        String[] result;
+        String result;
 
         if (annotation != null) {
             result = annotation.value();
@@ -105,5 +114,88 @@ public class Router implements RequestResolver {
         }
 
         return result;
+    }
+
+    private static class Handler {
+        private final Map<String, Method> methodMap = new HashMap<>();
+        private final Object controller;
+
+        public Handler(Object controller) {
+            this.controller = controller;
+            ejectControllerMethodsMap();
+        }
+
+        /**
+         * Invokes method of controller if exists
+         * @param url - request url
+         * @param method - http method name
+         * @param request - http request
+         * @param response - http response
+         * @return true if method is invoked, otherwise false
+         * @throws InvocationTargetException - cannot invoke method
+         * @throws IllegalAccessException - method is not public
+         */
+        public boolean invoke(String url, String method, HttpServletRequest request, HttpServletResponse response) throws InvocationTargetException, IllegalAccessException {
+            Method[] methods = methodMap.entrySet().stream()
+                    .filter(it -> isRightMethod(url, method, it))
+                    .map(Map.Entry::getValue)
+                    .toArray(Method[]::new);
+            Method methodToInvoke = null;
+            if (methods.length > 1) {
+                methodToInvoke = Arrays.stream(methods)
+                        .max(Comparator.comparingInt(o -> o.getName().length()))
+                        .orElse(null);
+            } else if (methods.length == 1) {
+                methodToInvoke = methods[0];
+            }
+
+            if (methodToInvoke == null) {
+                return false;
+            }
+
+            LOGGER.debug(methodToInvoke);
+            methodToInvoke.invoke(controller, request, response);
+            return true;
+        }
+
+        private boolean isRightMethod(String url, String method, Map.Entry<String, Method> entry) {
+            WebRequest annotation = entry.getValue().getAnnotation(WebRequest.class);
+            return url.endsWith(entry.getKey()) && annotation.method().isMethod(method);
+        }
+
+        private void ejectControllerMethodsMap() {
+            Method[] methods = Arrays.stream(controller.getClass().getDeclaredMethods())
+                    .filter(method -> method.isAnnotationPresent(WebRequest.class))
+                    .toArray(Method[]::new);
+
+            for (Method method : methods) {
+                boolean isCorrectParams = Arrays.equals(method.getParameterTypes(),
+                        new Class<?>[]{ HttpServletRequest.class, HttpServletResponse.class });
+                if (!isCorrectParams) {
+                    throw new IllegalArgumentException("Controller haven't got params HttpServletRequest and HttpServletResponse");
+                }
+                String value = method.getAnnotation(WebRequest.class).value();
+                value = removeEndSlash(value);
+                checkUrlFormat(value);
+                methodMap.put(value, method);
+            }
+        }
+
+        public Class<?> getControllerClass() {
+            return controller.getClass();
+        }
+    }
+
+    private static void checkUrlFormat(String value) {
+        if (value.length() > 1 && !value.startsWith("/")) {
+            throw new IllegalArgumentException("WebRequest value should start with /: " + value);
+        }
+    }
+
+    private static String removeEndSlash(String str) {
+        if (str.length() < 2) {
+            return str;
+        }
+        return str.endsWith("/") ? str.substring(0, str.length() - 1) : str;
     }
 }

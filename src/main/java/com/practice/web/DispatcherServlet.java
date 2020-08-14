@@ -3,7 +3,8 @@ package com.practice.web;
 import com.practice.web.context.ApplicationContext;
 import com.practice.web.context.NotFoundRouteException;
 import com.practice.web.context.RequestResolver;
-import com.practice.web.context.Router;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -13,6 +14,7 @@ import java.io.IOException;
 
 public class DispatcherServlet extends HttpServlet {
 
+    private static final Logger LOGGER = LogManager.getLogger(DispatcherServlet.class);
     private RequestResolver router;
     private String rootView;
 
@@ -24,13 +26,14 @@ public class DispatcherServlet extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        LOGGER.info(req.getRequestURI());
         if ("/".equals(req.getRequestURI())) {
             req.getRequestDispatcher(rootView).forward(req, resp);
         } else {
             try {
                 router.resolve(req, resp);
             } catch (NotFoundRouteException e) {
-                //resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 req.getRequestDispatcher(rootView).include(req, resp);
             }
         }

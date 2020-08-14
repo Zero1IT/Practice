@@ -3,9 +3,7 @@ package com.practice.web;
 import com.practice.theater.ServiceLocator;
 import com.practice.web.context.ApplicationContext;
 import com.practice.web.context.security.RequestAuthorize;
-import com.practice.web.controllers.LoginController;
-import com.practice.web.controllers.RegistrationController;
-import com.practice.web.controllers.TokenController;
+import com.practice.web.controllers.SignController;
 import com.practice.web.controllers.api.UserController;
 
 import javax.servlet.ServletContextEvent;
@@ -20,9 +18,7 @@ public class ServletContextLoadListener implements ServletContextListener {
     public void contextInitialized(ServletContextEvent s) {
         ApplicationContext context = new ApplicationContext.Builder()
                 .addController(new UserController())
-                .addController(new RegistrationController())
-                .addController(new LoginController())
-                .addController(new TokenController())
+                .addController(new SignController())
                 .addAuthorization(new RequestAuthorize())
                 .autoResolveNotFound(false)
                 .build();

@@ -37,5 +37,15 @@ public final class Utils {
         return hash("SHA-256", str);
     }
 
+    public static String capitalize(String str) {
+        if (str != null && str.length() != 0) {
+            char[] chars = str.toCharArray();
+            chars[0] = Character.toUpperCase(chars[0]);
+            return new String(chars);
+        } else {
+            return str;
+        }
+    }
+
     private Utils() {}
 }

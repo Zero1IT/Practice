@@ -1,7 +1,6 @@
 package com.practice.web.context;
 
 import com.practice.web.context.security.WebAuthorize;
-import com.practice.web.controllers.Controller;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -34,7 +33,7 @@ public class ApplicationContext {
 
     public static class Builder {
         private final ApplicationContext applicationContext;
-        private final Set<Controller> controllers = new HashSet<>();
+        private final Set<Object> controllers = new HashSet<>();
         private WebAuthorize authorize;
         private boolean autoResolve;
 
@@ -44,10 +43,10 @@ public class ApplicationContext {
 
         /**
          * Add controller to application
-         * @param controller - controller {@link Controller}
+         * @param controller - controller {@link Object}
          * @return this object {@link ApplicationContext.Builder}
          */
-        public Builder addController(Controller controller) {
+        public Builder addController(Object controller) {
             controllers.add(controller);
             return this;
         }
@@ -72,7 +71,7 @@ public class ApplicationContext {
          */
         public ApplicationContext build() {
             applicationContext.mappingResolver = new Router(autoResolve, authorize);
-            for (Controller controller : controllers) {
+            for (Object controller : controllers) {
                 applicationContext.mappingResolver.addMapping(controller);
             }
             return applicationContext;

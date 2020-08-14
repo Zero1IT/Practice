@@ -1,6 +1,7 @@
 package com.practice.theater.repository.jdbc;
 
 import com.practice.theater.ServiceLocator;
+import com.practice.theater.Utils;
 import com.practice.theater.db.annotations.*;
 import com.practice.theater.db.exceptions.DatabaseException;
 import com.practice.theater.db.exceptions.ForeignKeyException;
@@ -8,7 +9,6 @@ import com.practice.theater.db.exceptions.MappingValueException;
 import com.practice.theater.db.jdbc.StatementBuilder;
 import com.practice.theater.repository.InvalidMethodException;
 import com.practice.theater.repository.Repository;
-import com.sun.xml.internal.ws.util.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -368,7 +368,7 @@ public abstract class GenericJdbcRepository <K extends Serializable, T> implemen
     @NotNull
     private Method getBeanMethod(Class<?> cl, Field field, String prefix, @Nullable Class<?> returnType, Class<?> ... params) {
         try {
-            Method method = cl.getMethod(prefix + StringUtils.capitalize(field.getName()), params);
+            Method method = cl.getMethod(prefix + Utils.capitalize(field.getName()), params);
             if (returnType != null && !returnType.isAssignableFrom(method.getReturnType())) {
                 throw new InvalidMethodException("Method invalid return type for field " + field.getName());
             }

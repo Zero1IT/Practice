@@ -5,8 +5,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target({ElementType.TYPE})
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface WebController {
-    String value();
+public @interface WebRequest {
+    String value() default "";
+    HttpMethod method() default HttpMethod.GET;
 }
