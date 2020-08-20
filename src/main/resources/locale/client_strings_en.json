@@ -1,0 +1,13 @@
+{
+  "rootPage": {
+    "lang": "Language",
+    "profile": "Profile",
+    "basket": "Basket",
+    "out": "Sign Out"
+  },
+  "playPage": {
+    "author": "Author",
+    "genre": "Genre",
+    "dates": "Dates"
+  }
+}

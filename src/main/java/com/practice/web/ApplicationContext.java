@@ -1,6 +1,8 @@
-package com.practice.web.context;
+package com.practice.web;
 
-import com.practice.web.context.security.WebAuthorize;
+import com.practice.web.config.RequestResolver;
+import com.practice.web.config.security.WebAuthorize;
+import com.practice.web.dto.JwtPayload;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -34,7 +36,7 @@ public class ApplicationContext {
     public static class Builder {
         private final ApplicationContext applicationContext;
         private final Set<Object> controllers = new HashSet<>();
-        private WebAuthorize authorize;
+        private WebAuthorize<JwtPayload> authorize;
         private boolean autoResolve;
 
         public Builder() {
@@ -51,7 +53,7 @@ public class ApplicationContext {
             return this;
         }
 
-        public Builder addAuthorization(WebAuthorize p) {
+        public Builder addAuthorization(WebAuthorize<JwtPayload> p) {
             authorize = p;
             return this;
         }

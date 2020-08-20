@@ -1,4 +1,4 @@
-package com.practice.web.context;
+package com.practice.web.config;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

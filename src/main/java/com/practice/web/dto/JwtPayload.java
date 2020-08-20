@@ -6,6 +6,9 @@ public class JwtPayload {
     private long userId;
     private Role role;
 
+    public JwtPayload() {
+    }
+
     public JwtPayload(long userId, CredentialsDto dto) {
         this.userId = userId;
         role = dto.getRole();

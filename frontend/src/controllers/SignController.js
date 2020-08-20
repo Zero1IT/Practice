@@ -2,7 +2,8 @@ import {Controller} from "./Controller";
 import {EVENT} from "../views/SignView";
 import {LoginDto} from "../models/dto/LoginDto";
 import {RegistrationDto} from "../models/dto/RegistrationDto";
-import {app} from "../app";
+import {app, URLS} from "../app";
+import {NAVIGATOR} from "../navigator";
 
 export class SignController extends Controller {
 
@@ -22,10 +23,7 @@ export class SignController extends Controller {
      * @return {Promise<void>}
      */
     async signIn(data) {
-        let response = await app.fetcher.jsonRequest("/login", "POST", data.model.toJson());
-        if (response.ok) {
-            
-        }
+        this.doSign(data, URLS.login);
     }
 
     /**
@@ -33,10 +31,15 @@ export class SignController extends Controller {
      * @return {Promise<void>}
      */
     async signUp(data) {
-        let response = await app.fetcher.jsonRequest("/registration", "POST", data.model.toJson());
+        await this.doSign(data, URLS.registration);
+    }
+
+    async doSign(data, url) {
+        let response = await app.fetcher.jsonRequest(url, "POST", data.model.toJson());
         if (response.ok) {
             let json = await response.json();
-            app.acceptJwtToken(json);
+            await app.acceptJwtToken(json);
+            app.router.navigateTo(NAVIGATOR.HOME, false, true);
         } else {
             throw new Error(`${response.status}`);
         }

@@ -1,3 +1,4 @@
+import {progress} from "./ProgressLoader";
 
 export class Router {
     /**
@@ -20,7 +21,9 @@ export class Router {
 
     /**
      * Callback for handle url
-     * @callback urlHandler
+     * @callback urlHandler - async function
+     * @param url {String=}
+     * @param index {Number=} - index of symbol '?' for eject params
      * @return {Promise<*>}
      */
 
@@ -37,16 +40,26 @@ export class Router {
      * Navigate to given url
      * @param {String} url
      * @param {Boolean=} silent - false for add to history otherwise true
+     * @param replace {Boolean=} - use replaceState
      */
-    navigateTo(url, silent= false) {
-        let handler = this.urlMap.get(url);
+    navigateTo(url, silent= false, replace = false) {
+        let paramIndex = url.indexOf("?");
+        let handler = this.urlMap.get(paramIndex < 0 ? url : url.substring(0, paramIndex));
         if (handler) {
+            progress.show();
             if (!silent) {
-                history.pushState(null, null, url);
+                if (replace) {
+                    history.replaceState(null, null, url);
+                } else {
+                    history.pushState(null, null, url);
+                }
             }
-            handler().catch(e => console.error(`Unhandled error ${e}`));
+            handler(url, paramIndex)
+                .then(() => progress.hide())
+                .catch(e => console.error(`Unhandled error (navigateTo) - ${e}`));
         } else if (this.options && this.options.page404) {
-            this.options.page404(url).catch(e => console.error(`Unhandled error ${e}`));
+            this.options.page404(url)
+                .catch(e => console.error(`Unhandled error ${e}`));
         } else {
             alert(`Cannot handle navigate to ${url}`)
         }

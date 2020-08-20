@@ -8,9 +8,8 @@ import com.practice.theater.repository.PlayDateRepository;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +30,7 @@ public class JdbcPlayDateRepository extends JdbcRepository<Long, PlayDate> imple
             String query = ServiceLocator.getInstance().getQuery("playdate.by_play_from");
             try (PreparedStatement statement = connection.prepareStatement(query)) {
                 statement.setLong(1, play.getId());
-                statement.setObject(2, LocalDateTime.ofInstant(from, ZoneOffset.UTC));
+                statement.setObject(2, LocalDateTime.ofInstant(from, ZoneId.systemDefault()));
                 ResultSet resultSet = statement.executeQuery();
                 while (resultSet.next()) {
                     playDates.add(ejectInstance(resultSet, play));

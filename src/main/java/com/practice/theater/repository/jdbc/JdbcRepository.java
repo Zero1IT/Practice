@@ -7,11 +7,8 @@ import java.util.Optional;
 
 public abstract class JdbcRepository<K extends Serializable, T> extends GenericJdbcRepository<K, T> {
 
-    private final Class<T> entityClass;
-
     JdbcRepository(Class<T> cl) {
         super(cl);
-        entityClass = cl;
     }
 
     @Override

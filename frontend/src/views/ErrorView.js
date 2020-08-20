@@ -8,7 +8,8 @@ export class ErrorView extends View {
      * @param {PageError} model - view model
      */
     constructor(parent = null, model = undefined) {
-        super(parent, model);
+        super(parent);
+        this.model = model;
     }
 
     async render() {

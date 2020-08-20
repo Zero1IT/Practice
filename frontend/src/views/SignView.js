@@ -10,11 +10,12 @@ class SignView extends View {
      * @param {Object=} model - view model
      */
     constructor(parent = null, model = undefined) {
-        super(parent, model);
+        super(parent);
+        this.model = model;
     }
 
     async render() {
-        this._render(`
+        await this._render(`
             <div class="login-wrap">
                 <div class="login-html">
                     <input id="tab-1" type="radio" name="tab" class="sign-in" checked><label for="tab-1" class="tab">Sign In</label>
@@ -22,7 +23,7 @@ class SignView extends View {
                     <div class="login-form">
                         <div class="sign-in-htm">
                             <div class="group">
-                                <label for="s_email" class="group-label">Username</label>
+                                <label for="s_email" class="group-label">Email</label>
                                 <input id="s_email" type="text" class="form-input">
                                 <span class="error-highlight"></span>
                             </div>

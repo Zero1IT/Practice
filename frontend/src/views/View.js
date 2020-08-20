@@ -7,12 +7,10 @@ export class View {
 
     /**
      * @param {HTMLElement|View} parent - content container
-     * @param model - view model
      */
-    constructor(parent= null, model = null) {
+    constructor(parent= null) {
         this.container = null;
         this.parent = parent;
-        this.model = model;
         /**
          * @type {Controller}
          */
@@ -41,13 +39,6 @@ export class View {
     }
 
     /**
-     * Should be used every time before rendering (render() call)
-     */
-    clearCache() {
-        this._htmlCache.clear();
-    }
-
-    /**
      * Find and cache html element inside current container (if it's class return first in DOM)
      * @param selector {String} - id or class selector for child container
      * @return HTMLElement
@@ -70,8 +61,8 @@ export class View {
      * @return {HTMLElement} - container if view rendered itself, otherwise view's html string
      * @protected
      */
-    _render(html, root = undefined) {
-        let container = this.parent instanceof View ? this.parent.render() : this.parent;
+    async _render(html, root = undefined) {
+        let container = this.parent instanceof View ? await this.parent.render() : this.parent;
         container.innerHTML = html;
         if (root) {
             container = this._getElementBySelector(container, root);

@@ -1,8 +1,9 @@
-package com.practice.web.context.security;
+package com.practice.web.config.security;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public interface WebAuthorize {
+public interface WebAuthorize<T> {
     boolean allowAccess(HttpServletRequest req, HttpServletResponse resp, Authorize authorize);
+    T getAuthentication(HttpServletRequest req, HttpServletResponse resp);
 }

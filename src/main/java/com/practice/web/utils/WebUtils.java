@@ -1,6 +1,8 @@
 package com.practice.web.utils;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.practice.theater.ServiceLocator;
+import com.practice.web.config.WebParam;
 import com.practice.web.dto.JwtPayload;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -8,13 +10,12 @@ import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.Nullable;
 
 import javax.crypto.SecretKey;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -44,14 +45,14 @@ public final class WebUtils {
     /**
      * Creates jwt tokens for access and refresh
      * @param payload - payload for access token
-     * @return map with two keys (access , refresh)
+     * @return map with two keys (access {@see WebUtils.ACCESS_TOKEN}, refresh {@see WebUtils.REFRESH_TOKEN})
      */
     public static Map<String, String> createJwtTokens(JwtPayload payload) {
         Map<String, String> tokens = new HashMap<>();
         Key key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(WebUtils.getSecretKey()));
         String access = Jwts.builder()
                 .setExpiration(getExpirationDate(0, 1))
-                .setSubject(JsonUtils.toJson(payload).orElse(""))
+                .setSubject(JsonUtils.toJson(payload))
                 .signWith(key)
                 .compact();
         String refresh = Jwts.builder()
@@ -64,6 +65,7 @@ public final class WebUtils {
         return tokens;
     }
 
+    @Nullable
     public static Claims parseJwsPayload(String token) {
         try {
             Jws<Claims> claims = Jwts.parserBuilder()
@@ -85,7 +87,7 @@ public final class WebUtils {
 
     public static void updateAndSendJwsTokens(HttpServletResponse resp, JwtPayload payload) throws IOException {
         Map<String, String> tokens = WebUtils.createJwtTokens(payload);
-        String json = JsonUtils.toJson(tokens).orElse("");
+        String json = JsonUtils.toJson(tokens);
         ServiceLocator.getInstance().getServiceFactory().tokenService()
                 .saveRefreshToken(payload.getUserId(), tokens.get("refresh"));
         WebUtils.sendJsonResponse(resp, json);
@@ -97,7 +99,7 @@ public final class WebUtils {
                 String fileName = CLASS_PATH_DELIMITER + ServiceLocator.SETTINGS_FILE + ".properties";
                 Properties properties = new Properties();
                 properties.load(WebUtils.class.getResourceAsStream(fileName));
-                if (properties.contains("key")) {
+                if (properties.containsKey("key")) {
                     privateKey = properties.getProperty("key");
                 } else {
                     createAndSaveKey(fileName, properties);
@@ -132,6 +134,16 @@ public final class WebUtils {
                     properties.store(outputStream, null);
                 }
             }
+        }
+    }
+
+    public static JsonNode getJsonLanguageResource(String language) {
+        String file = String.format("/locale/client_strings_%s.json", language.toLowerCase());
+        try (InputStream stream = WebUtils.class.getResourceAsStream(file)) {
+            return JsonUtils.asJsonNode(stream);
+        } catch (IOException e) {
+            LOGGER.error(e);
+            return null;
         }
     }
 

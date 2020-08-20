@@ -1,4 +1,4 @@
-package com.practice.web.controllers;
+package com.practice.web.api;
 
 
 public class RegistrationControllerTests {

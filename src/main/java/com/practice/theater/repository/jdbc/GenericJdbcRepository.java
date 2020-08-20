@@ -21,6 +21,7 @@ import java.lang.reflect.Method;
 import java.sql.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.*;
@@ -125,7 +126,7 @@ public abstract class GenericJdbcRepository <K extends Serializable, T> implemen
         } else {
             Object o = invokeGetter(key, instance);
             if (o instanceof Instant) {
-                statement.setObject(index++, LocalDateTime.ofInstant(((Instant) o), ZoneOffset.systemDefault()));
+                statement.setObject(index++, LocalDateTime.ofInstant(((Instant) o), ZoneId.systemDefault()));
             } else {
                 statement.setObject(index++, o);
             }

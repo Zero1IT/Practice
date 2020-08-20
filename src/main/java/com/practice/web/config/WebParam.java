@@ -1,13 +1,12 @@
-package com.practice.web.context;
+package com.practice.web.config;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target(ElementType.METHOD)
+@Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface WebRequest {
-    String value() default "";
-    HttpMethod method() default HttpMethod.GET;
+public @interface WebParam {
+    String value();
 }

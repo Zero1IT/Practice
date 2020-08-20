@@ -6,6 +6,11 @@
     box-sizing: border-box;
 }
 
+html {
+    min-height: 100%;
+    position: relative;
+}
+
 a {
     color: inherit;
     text-decoration: none;
@@ -22,10 +27,209 @@ button, input[type=submit] {
 }
 
 .header-menu {
-    width: 100%;
-    height: 100px;
-    background: wheat;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 10px;
 }
+
+.header-nav-links li {
+    display: inline-block;
+    padding: 10px;
+}
+
+.header-nav-links li a {
+    cursor: pointer;
+    transition: all 0.3s ease 0s;
+}
+
+.header-nav-links li a:hover {
+    color: #0088a9;
+}
+
+.sign-in-btn {
+    background-color: rgba(0, 136, 169, 1);
+    border: none;
+    border-radius: 35px;
+    color: #dbd1d1;
+    padding: 10px 30px;
+    transition: all 0.3s ease 0s;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    width: 150px;
+}
+
+.sign-in-btn:hover {
+    background-color: rgba(0, 136, 169, 0.8);
+    color: #3c3a3a;
+}
+
+.header-sign {
+    display: flex;
+    align-items: center;
+    margin-right: 20px;
+}
+
+.language-selector {
+    cursor: pointer;
+    margin-left: 20px;
+    margin-right: 10px;
+    position: relative;
+}
+
+.language-selector-nav::after {
+    box-shadow: -2px 2px 0 black;
+    content: "";
+    display: block;
+    height: 10px;
+    top: 0;
+    right: -15px;
+    bottom: 0;
+    position: absolute;
+    width: 10px;
+    -o-transform: rotate(-45deg);
+    -webkit-transform: rotate(-45deg);
+    -moz-transform: rotate(-45deg);
+}
+
+.language-selector:hover .language-list {
+    display: block;
+}
+
+.language-selector:hover .language-selector-nav::after {
+    box-shadow: 2px -2px 0 black;
+}
+
+.language-list {
+    background-color: #1d2fc1;
+    color: white;
+    display: none;
+    position: absolute;
+    transition: all 0.5s ease 0s;
+    border-radius: 5px;
+}
+
+.selected-language {
+    background-color: #ec5e26;
+}
+
+.language-list li {
+    padding: 10px;
+}
+
+.language-list>li:first-child {
+    border-radius: 5px 5px 0 0;
+}
+
+.language-list>li:last-child {
+    border-radius: 0 0 5px 5px;
+}
+
+.language-list li:hover {
+    background-color: #ec5e26;
+}
+
+#root {
+    flex: 1 1 800px;
+    -webkit-flex: 1 1 800px;
+}
+
+.plays-content-wrapper {
+    width: 100%;
+}
+
+.plays-list {
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
+    width: 70%;
+}
+
+.play-item {
+    margin: 25px 0;
+}
+
+.play-dates-list>li {
+    display: inline-block;
+}
+
+.play-dates-list>li:not(:first-child) {
+    background-color: #ffcd9f;
+    border-radius: 5px;
+    position: relative;
+}
+
+.play-dates-list a {
+    display: block;
+    padding: 5px;
+}
+
+.h-item {
+    font-style: italic;
+}
+
+.footer-menu {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 20px;
+}
+
+.copyright span {
+    font-style: oblique;
+    font-size: 14pt;
+}
+
+.copyright .copy-sign {
+    display: inline-block;
+    transition: all 0.5s ease 0s;
+}
+
+.copyright:hover .copy-sign {
+    -webkit-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+}
+
+.user-profile-menu {
+    position: relative;
+}
+
+.profile-menu-list {
+    display: none;
+    width: 150px;
+    height: 100px;
+    padding-top: 40px;
+    position: absolute;
+    top: 0;
+}
+
+.profile-menu-list li {
+    padding: 10px 5px;
+    text-align: center;
+    background-color: #00FFFF;
+}
+
+.profile-menu-list li:first-child {
+    border-radius: 5px 5px 0 0;
+}
+
+.profile-menu-list li:last-child {
+    border-radius: 0 0 5px 5px;
+}
+
+.profile-menu-list li:hover {
+    background-color: #fff;
+}
+
+.user-profile-menu:hover .profile-menu-list {
+    display: block;
+}
+
+/** PlayOrder page **/
+
+
 
 /** login page **/
 /*background: #c8c8c8;*/
@@ -268,5 +472,46 @@ button, input[type=submit] {
     }
     .notfound .notfound-code h1 {
         font-size: 112px;
+    }
+}
+
+.progress-loader {
+    display: none;
+    background-color: rgba(77, 77, 95, 0.5);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+}
+
+.progress {
+    position: relative;
+    color: #808080;
+    font-size: 60pt;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    border-bottom: 10px solid #808080;
+}
+
+.progress::before {
+    animation: loading 4s infinite linear;
+    color: #00FFFF;
+    content: "Loading...";
+    position: absolute;
+    border-bottom: 10px solid #00FFFF;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+}
+
+@keyframes loading {
+    0% {
+        width: 0;
+    }
+    100% {
+        width: 100%;
     }
 }

@@ -1,21 +1,13 @@
 package com.practice.theater.repository.jdbc;
 
 import com.practice.theater.ServiceLocator;
-import com.practice.theater.models.Play;
-import com.practice.theater.models.PlayDate;
 import com.practice.theater.models.Role;
 import com.practice.theater.models.User;
 import com.practice.theater.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 
 import java.sql.*;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;

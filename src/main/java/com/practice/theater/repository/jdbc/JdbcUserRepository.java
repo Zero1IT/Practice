@@ -27,7 +27,7 @@ public class JdbcUserRepository extends JdbcRepository<Long, User> implements Us
     }
 
     @Override
-    public Role getRoleById(long id) {
+    public Role getRoleByUserId(long id) {
         RoleConverter converter = new RoleConverter();
         AtomicReference<Role> roleReference = new AtomicReference<>();
         executeAsTransaction(connection -> {

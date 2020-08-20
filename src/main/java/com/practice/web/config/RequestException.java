@@ -1,4 +1,4 @@
-package com.practice.web.context;
+package com.practice.web.config;
 
 public class RequestException extends RuntimeException {
     private final int code;

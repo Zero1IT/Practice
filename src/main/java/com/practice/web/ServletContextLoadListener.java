@@ -1,10 +1,10 @@
 package com.practice.web;
 
 import com.practice.theater.ServiceLocator;
-import com.practice.web.context.ApplicationContext;
-import com.practice.web.context.security.RequestAuthorize;
-import com.practice.web.controllers.SignController;
-import com.practice.web.controllers.api.UserController;
+import com.practice.web.api.PlayController;
+import com.practice.web.config.security.JwsAuthorize;
+import com.practice.web.api.SignController;
+import com.practice.web.api.UserController;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -19,7 +19,8 @@ public class ServletContextLoadListener implements ServletContextListener {
         ApplicationContext context = new ApplicationContext.Builder()
                 .addController(new UserController())
                 .addController(new SignController())
-                .addAuthorization(new RequestAuthorize())
+                .addController(new PlayController())
+                .addAuthorization(new JwsAuthorize())
                 .autoResolveNotFound(false)
                 .build();
         context.registerJdbcDriver();

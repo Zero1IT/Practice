@@ -23,4 +23,10 @@ public class TokenServiceImpl implements TokenService {
         refreshToken.setToken(token);
         return repository.addOrUpdate(refreshToken);
     }
+
+    @Override
+    public void deleteTokenByUserId(long userId) {
+        repository.findTokenByUserId(userId)
+                .ifPresent(repository::remove);
+    }
 }

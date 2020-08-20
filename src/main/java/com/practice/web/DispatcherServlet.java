@@ -1,8 +1,7 @@
 package com.practice.web;
 
-import com.practice.web.context.ApplicationContext;
-import com.practice.web.context.NotFoundRouteException;
-import com.practice.web.context.RequestResolver;
+import com.practice.web.config.NotFoundRouteException;
+import com.practice.web.config.RequestResolver;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -33,7 +32,7 @@ public class DispatcherServlet extends HttpServlet {
             try {
                 router.resolve(req, resp);
             } catch (NotFoundRouteException e) {
-                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                //resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 req.getRequestDispatcher(rootView).include(req, resp);
             }
         }

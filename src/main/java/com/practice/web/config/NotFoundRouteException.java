@@ -1,4 +1,4 @@
-package com.practice.web.context;
+package com.practice.web.config;
 
 public class NotFoundRouteException extends Exception {
 

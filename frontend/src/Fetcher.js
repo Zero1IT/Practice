@@ -1,12 +1,12 @@
-import {app} from "./app";
+import {app, URLS} from "./app";
 import {statusCodes} from "./httpStatus";
 
 export class Fetcher {
     /**
      * @return Promise<Response> - fetch() promise
      */
-    async jsonRequest(url, method, jsonData) {
-        let auth = await this.getJwtTokenHeader();
+    async jsonRequest(url, method = "GET", jsonData = undefined) {
+        let auth = await this.updateJwtTokenHeader();
         return fetch(url, {
             method: method,
             headers: {
@@ -17,18 +17,20 @@ export class Fetcher {
         });
     }
 
-    async getJwtTokenHeader() {
-        if (!app.token) {
-            return "";
-        }
-        if (new Date().getTime() > app.tokenPayload.exp * 1000) {
+    async updateJwtTokenHeader() {
+        if (app.token) {
+            let isEnd = new Date().getTime() > app.tokenPayload.exp * 1000;
+            if (isEnd) {
+                await this.refreshTokenRequest();
+            }
+        } else if (app.refreshToken) {
             await this.refreshTokenRequest();
         }
         return `Bearer ${app.token}`;
     }
 
     async refreshTokenRequest() {
-        let response = await fetch("/refresh-token", {
+        let response = await fetch(URLS.refreshToken, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json;charset=utf-8"
@@ -36,9 +38,35 @@ export class Fetcher {
             body: JSON.stringify({token: app.refreshToken})
         });
         if (response.ok) {
-            app.acceptJwtToken(await response.json());
+            await app.acceptJwtToken(await response.json());
         } else if (response.status === statusCodes.UNAUTHORIZED) {
             // TODO: then or always redirect
         }
+    }
+
+    /**
+     * Returns response if status 200 (OK), or handles another status
+     * @param response {Response}
+     * @param excludedCodes {Array<Number>} - codes that will not be handled
+     * @return {Response} - given response, or undefined if status isn't 200
+     */
+    clearResponse(response, excludedCodes) {
+        if (response.ok || excludedCodes.includes(response.status)) {
+            return response;
+        }
+
+        switch (response.status) {
+            case statusCodes.UNAUTHORIZED:
+                // TODO: wasn't authorize
+                break;
+            case statusCodes.FORBIDDEN:
+                // TODO: invalid credentials
+                break;
+            case statusCodes.BAD_REQUEST:
+                // TODO: incorrect request
+                break;
+        }
+
+        return undefined;
     }
 }
