@@ -6,8 +6,7 @@ import com.practice.theater.db.ConnectionPool;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public class JdbcPooledConnectionFactory extends ConnectionFactory {
-
+public class JdbcPooledConnectionFactory implements ConnectionFactory {
     private final ConnectionPool connectionPool;
 
     public JdbcPooledConnectionFactory(String url) {

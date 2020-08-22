@@ -26,6 +26,7 @@ public class ApplicationContext {
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                 NoSuchMethodException | ClassNotFoundException e) {
             logger.error(e);
+            throw new RuntimeException(e);
         }
     }
 

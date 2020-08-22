@@ -5,11 +5,11 @@ import com.practice.theater.db.jdbc.JdbcPooledConnectionFactory;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public abstract class ConnectionFactory {
+public interface ConnectionFactory {
 
-    public static ConnectionFactory getPooledConnectionFactory(String url) {
+    static ConnectionFactory getPooledConnectionFactory(String url) {
         return new JdbcPooledConnectionFactory(url);
     }
 
-    public abstract Connection openConnection() throws SQLException;
+    Connection openConnection() throws SQLException;
 }
