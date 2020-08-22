@@ -1,11 +1,8 @@
 import {Validator} from "./Validator";
-import {Fetcher} from "./Fetcher";
 import strings from "./values/strings.en"
-import {UserDto} from "./models/dto/UserDto";
 import {createRouter} from "./navigator";
 import {progress} from "./ProgressLoader";
-
-const REFRESH_TOKEN_KEY = "jwt_refresh_token";
+import {Session} from "./Session";
 
 /**
  * @typedef {{
@@ -36,21 +33,17 @@ const LOCALE = {
 class App {
 
     constructor() {
+        this.isInitialized      = false;
         this.validator          = new Validator();
-        this.fetcher            = new Fetcher();
         this.locale             = this.defaultLocale();
         this.values             = strings;
         this.router             = null;
-        this.dataDefaultInit();
+        this.defaultInit();
     }
 
-    dataDefaultInit() {
-        this.isInitialized      = false;
-        this.refreshToken       = localStorage.getItem(REFRESH_TOKEN_KEY);
-        this.tokenPayload       = null;
-        this.token              = null;
-        /** @type {UserDto} */
-        this.user               = null;
+    defaultInit() {
+        this.session            = new Session();
+        this.fetcher            = this.session.fetcher;
     }
 
     /**
@@ -58,41 +51,23 @@ class App {
      * @param token - valid jwt token
      */
     async acceptJwtToken(token) {
-        try {
-            this.refreshToken = token.refresh;
-            this.token = token.access;
-            let payload = this.token.split(".")[1];
-            this.tokenPayload = JSON.parse(atob(payload));
-            localStorage.setItem(REFRESH_TOKEN_KEY, this.refreshToken);
-            await this.loadUserInfo();
-        } catch (e) {
-            console.error(e);
-        }
+        await this.session.openSession(token);
     }
 
-    async loadUserInfo() {
-        let response = await this.fetcher.jsonRequest(URLS.userInfo);
-        if (response.ok) {
-            this.user = await response.json();
-        } else {
-            console.log(response);
-            // TODO:
-        }
+    async signOut() {
+        await this.session.destroySession();
+        this.defaultInit();
     }
 
-    async initializeApp(primary = true) {
+    async initializeApp() {
         progress.show();
         if (this.isInitialized) {
             throw new Error("App has already initialized");
         }
         await loadResources();
-        if (this.refreshToken) {
-            await app.fetcher.refreshTokenRequest();
-        }
+        await this.session.tryUpdateTokens();
         this.router = createRouter(this);
-        if (primary) {
-            this.router.navigateTo(window.location.pathname, true);
-        }
+        this.router.navigateTo(window.location.pathname, true);
         this.isInitialized = true;
         progress.hide();
     }
@@ -111,13 +86,6 @@ class App {
             }
         }
         throw new Error(`Invalid locale ${newLocale}`);
-    }
-
-    async signOut() {
-        await this.fetcher.jsonRequest(URLS.signOut, "POST"); // first remove token from server
-        localStorage.removeItem(REFRESH_TOKEN_KEY);
-        this.dataDefaultInit();
-        await this.initializeApp(false);
     }
 
     defaultLocale() {

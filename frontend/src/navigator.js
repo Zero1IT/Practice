@@ -24,7 +24,7 @@ const containerController = new ContainerController();
 function createRouter(app) {
 
     function getContainerView() {
-        let c = new ContainerView(app.user, root);
+        let c = new ContainerView(app.session.user, root);
         c.setHandler(containerController);
         return c;
     }
@@ -37,8 +37,10 @@ function createRouter(app) {
     });
 
     document.body.addEventListener("click", e => {
+        // noinspection JSUnresolvedVariable
         if (e.target.tagName === "A") {
             e.preventDefault();
+            // noinspection JSUnresolvedFunction
             router.navigateTo(e.target.getAttribute("href"));
         }
     });

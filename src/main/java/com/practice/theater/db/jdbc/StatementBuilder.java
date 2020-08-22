@@ -116,7 +116,7 @@ public class StatementBuilder implements StatementCreator {
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             Object result = method.invoke(creator, args);
-            LOGGER.debug(result);
+            //LOGGER.debug(result);
             return result;
         }
     }
