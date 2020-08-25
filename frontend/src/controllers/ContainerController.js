@@ -1,7 +1,7 @@
 import {Controller} from "./Controller";
 import {EVENT} from "../views/ContainerView";
 import {app} from "../app";
-import {NAVIGATOR} from "../navigator";
+import {Navigator} from "../navigator";
 
 export class ContainerController extends Controller {
 
@@ -12,7 +12,7 @@ export class ContainerController extends Controller {
                 break;
             case EVENT.signOut:
                 await app.signOut();
-                app.router.navigateTo(NAVIGATOR.HOME);
+                app.router.forceNavigateTo(Navigator.HOME);
                 break;
         }
     }

@@ -1,6 +1,6 @@
 import {PlayDto} from "../../models/dto/PlayDto";
 import {app, resources} from "../../app";
-import {NAVIGATOR} from "../../navigator";
+import {Navigator} from "../../navigator";
 
 export class PlayItemViewPart {
 
@@ -49,7 +49,7 @@ export class PlayItemViewPart {
         let html = [];
         for (let item of this.model.dates) {
             let d = new Date(item.date.epochSecond * 1000).toLocaleString(app.locale);
-            html.push(`<li class="play-date"><a href="${NAVIGATOR.PLAY}?id=${this.model.id}&date=${item.id}">${d}</a></li>`);
+            html.push(`<li class="play-date"><a href="${Navigator.PLAY}?id=${this.model.id}&date=${item.id}">${d}</a></li>`);
         }
         return html.join("\n");
     }

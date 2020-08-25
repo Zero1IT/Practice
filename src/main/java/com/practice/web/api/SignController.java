@@ -11,8 +11,8 @@ import com.practice.web.config.WebRequest;
 import com.practice.web.config.security.Authorize;
 import com.practice.web.dto.CredentialsDto;
 import com.practice.web.dto.JwtPayload;
-import com.practice.web.services.interfaces.SignService;
-import com.practice.web.services.interfaces.TokenService;
+import com.practice.web.services.SignService;
+import com.practice.web.services.TokenService;
 import com.practice.web.utils.JsonUtils;
 import com.practice.web.utils.WebUtils;
 import com.practice.web.validators.CredentialsValidator;
@@ -73,7 +73,7 @@ public class SignController {
         tokenService.deleteTokenByUserId(payload.getUserId());
     }
 
-    private void checkUserValidityAndSendTokens(HttpServletRequest req, HttpServletResponse resp, CredentialsValidator validator,
+    private static void checkUserValidityAndSendTokens(HttpServletRequest req, HttpServletResponse resp, CredentialsValidator validator,
                                                 ToLongFunction<CredentialsDto> operation) throws IOException {
         Optional<CredentialsDto> dto = JsonUtils.parseRequest(req, CredentialsDto.class).filter(validator::isValid);
         if (dto.isPresent()) {

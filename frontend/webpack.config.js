@@ -6,6 +6,6 @@ module.exports = {
     entry: "./app.js",
     output: {
         filename: "bundle.js",
-        path: path.resolve(__dirname, "../web/resources/js")
+        path: path.resolve(__dirname, "../src/main/webapp/resources/js")
     }
 };

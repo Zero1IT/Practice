@@ -1,9 +1,9 @@
-package com.practice.web.services;
+package com.practice.web.services.impl;
 
 import com.practice.theater.ServiceLocator;
 import com.practice.theater.models.RefreshToken;
 import com.practice.theater.repository.TokenRepository;
-import com.practice.web.services.interfaces.TokenService;
+import com.practice.web.services.TokenService;
 
 import java.util.Optional;
 

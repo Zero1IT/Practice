@@ -8,7 +8,7 @@ import com.practice.web.config.WebRequest;
 import com.practice.web.config.security.Authorize;
 import com.practice.web.dto.JwtPayload;
 import com.practice.web.dto.UserDto;
-import com.practice.web.services.interfaces.UserService;
+import com.practice.web.services.UserService;
 
 import java.util.List;
 

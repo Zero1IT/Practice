@@ -22,6 +22,6 @@ export class PlayView extends View {
         <div class="plays-content-wrapper">
             <div class="plays-list">
             </div>
-        </div>`)
+        </div>`);
     }
 }

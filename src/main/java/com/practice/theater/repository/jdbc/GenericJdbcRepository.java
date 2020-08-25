@@ -22,7 +22,6 @@ import java.sql.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -79,7 +78,7 @@ public abstract class GenericJdbcRepository <K extends Serializable, T> implemen
         }
     }
 
-    private void transaction(Executor executor, Connection connection) throws SQLException {
+    private static void transaction(Executor executor, Connection connection) throws SQLException {
         try {
             connection.setAutoCommit(false);
             executor.execute(connection);
@@ -135,7 +134,7 @@ public abstract class GenericJdbcRepository <K extends Serializable, T> implemen
     }
 
     private void excludePrimaryKey(Field key) {
-        if (primaryKey == key) {
+        if (primaryKey == key) { // NOSONAR
             throw new MappingValueException(key);
         }
     }
@@ -187,18 +186,48 @@ public abstract class GenericJdbcRepository <K extends Serializable, T> implemen
     }
 
     protected List<T> findAllInstances() {
-        final String statement = StatementBuilder.getInstance().getAllStatement(tableName);
+        return readInstancesByStatement(StatementBuilder.getInstance().getAllStatement(tableName));
+    }
+
+    protected List<T> paginationSelect(long limit, long offset) {
+        return readInstancesByStatement(StatementBuilder.getInstance()
+                .paginationStatement(tableName, fieldsCache.get(primaryKey).name(), limit, offset));
+    }
+
+    protected List<T> paginationConditionSelect(String key, Object keyVal, long limit, long offset) {
+        return readPaginationByStatement(StatementBuilder.getInstance().paginationConditionStatement(
+                tableName, fieldsCache.get(primaryKey).name(), limit, offset, key), keyVal);
+    }
+
+    @NotNull
+    private List<T> readPaginationByStatement(String statement, Object val) {
         List<T> resultSet = new ArrayList<>();
         executeAsTransaction(connection -> {
             try (PreparedStatement st = connection.prepareStatement(statement)) {
-                try (ResultSet set = st.executeQuery()) {
-                    while (set.next()) {
-                        resultSet.add(ejectInstance(set));
-                    }
-                }
+                st.setObject(1, val);
+                ejectListInstances(resultSet, st);
             }
         });
         return resultSet;
+    }
+
+    @NotNull
+    private List<T> readInstancesByStatement(String statement) {
+        List<T> resultSet = new ArrayList<>();
+        executeAsTransaction(connection -> {
+            try (PreparedStatement st = connection.prepareStatement(statement)) {
+                ejectListInstances(resultSet, st);
+            }
+        });
+        return resultSet;
+    }
+
+    private void ejectListInstances(List<T> resultSet, PreparedStatement st) throws SQLException {
+        try (ResultSet set = st.executeQuery()) {
+            while (set.next()) {
+                resultSet.add(ejectInstance(set));
+            }
+        }
     }
 
     protected List<T> findByKeyInstances(String key, Object keyVal, Object ... constraints) {
@@ -253,11 +282,11 @@ public abstract class GenericJdbcRepository <K extends Serializable, T> implemen
         return result.get();
     }
 
-    private Object convertInstanceField(Field field, Object value, String methodName) {
+    private static Object convertInstanceField(Field field, Object value, String methodName) {
         try {
             Mapper mapper = field.getAnnotation(Mapper.class);
             @SuppressWarnings("rawtypes")
-            Converter converter = mapper.converter().getDeclaredConstructor().newInstance();
+            Converter converter = mapper.converter().getDeclaredConstructor().newInstance(); // NOSONAR
             Method method = mapper.converter().getMethod(methodName, value.getClass());
             return method.invoke(converter, value);
         } catch (InstantiationException | NoSuchMethodException |
@@ -267,11 +296,11 @@ public abstract class GenericJdbcRepository <K extends Serializable, T> implemen
         return null;
     }
 
-    private Object convertInstanceFieldFrom(Field field, Object value) {
+    private static Object convertInstanceFieldFrom(Field field, Object value) {
         return convertInstanceField(field, value, "convertFrom");
     }
 
-    private Object convertInstanceFieldTo(Field field, Object value) {
+    private static Object convertInstanceFieldTo(Field field, Object value) {
         return convertInstanceField(field, value, "convertTo");
     }
 
@@ -310,8 +339,8 @@ public abstract class GenericJdbcRepository <K extends Serializable, T> implemen
                 return first.get();
             }
         }
-        JdbcRepository repository = new JdbcRepository(type) {};
-        List result = repository.findByKeyInstances(fieldConstraintName, ref, instance);
+        JdbcRepository repository = new JdbcRepository(type) {}; // NOSONAR
+        List result = repository.findByKeyInstances(fieldConstraintName, ref, instance); // NOSONAR
         if (!result.isEmpty()) {
             return result.get(0);
         }
@@ -367,7 +396,7 @@ public abstract class GenericJdbcRepository <K extends Serializable, T> implemen
     }
 
     @NotNull
-    private Method getBeanMethod(Class<?> cl, Field field, String prefix, @Nullable Class<?> returnType, Class<?> ... params) {
+    private static Method getBeanMethod(Class<?> cl, Field field, String prefix, @Nullable Class<?> returnType, Class<?> ... params) {
         try {
             Method method = cl.getMethod(prefix + Utils.capitalize(field.getName()), params);
             if (returnType != null && !returnType.isAssignableFrom(method.getReturnType())) {

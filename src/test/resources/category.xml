@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<description>
+    <categories>
+        <category name="Last" price="5" />
+        <category name="Basic" price="7.50" />
+        <category name="Lucky" price="10" />
+    </categories>
+    <halls>
+        <hall name="Primary">
+            <row number="1" count="10" category="Lucky" hint="2__2__2__2__2"/>
+            <row number="2" count="10" category="Lucky"/>
+            <row number="3" count="10" category="Basic"/>
+            <row number="4" count="10" category="Basic"/>
+            <row number="5" count="10" category="Basic"/>
+            <row number="6" count="10" category="Basic"/>
+            <row number="7" count="10" category="Last"/>
+            <row number="8" count="10" category="Last"/>
+            <row number="9" count="10" category="Last"/>
+            <row number="10" count="10" category="Last"/>
+        </hall>
+    </halls>
+</description>

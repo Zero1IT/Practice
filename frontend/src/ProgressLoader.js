@@ -29,6 +29,22 @@ class ProgressLoader {
 
 const progress = new ProgressLoader();
 
+/**
+ * @callback operationWithProgress - async function
+ * @return {Promise<*>}
+ */
+ /**
+ * @param func {operationWithProgress}
+ */
+async function showProgressOperation(func) {
+    progress.show();
+    let res = await func();
+    progress.hide();
+    return res;
+}
+
 export {
-    progress
+    ProgressLoader,
+    progress,
+    showProgressOperation
 }

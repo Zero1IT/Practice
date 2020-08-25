@@ -2,7 +2,7 @@ package com.practice.theater;
 
 import com.practice.theater.db.ConnectionFactory;
 import com.practice.theater.repository.RepositoryFactory;
-import com.practice.web.services.interfaces.ServiceFactory;
+import com.practice.web.services.ServiceFactory;
 
 import java.util.ResourceBundle;
 

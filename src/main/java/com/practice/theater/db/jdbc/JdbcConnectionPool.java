@@ -54,6 +54,9 @@ public class JdbcConnectionPool implements ConnectionPool {
         synchronized (lock) {
             try {
                 if (!connection.isClosed()) {
+                    if (!connection.getAutoCommit()) {
+                        connection.setAutoCommit(true);
+                    }
                     connections.add(connection);
                 }
             } catch (SQLException e) {

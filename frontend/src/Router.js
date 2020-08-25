@@ -41,8 +41,12 @@ export class Router {
      * @param {String} url
      * @param {Boolean=} silent - false for add to history otherwise true
      * @param replace {Boolean=} - use replaceState
+     * @param force {Boolean} - anyway update
      */
-    navigateTo(url, silent= false, replace = false) {
+    navigateTo(url, silent= false, replace = false, force = false) {
+        if (!force && window.location.pathname === url && !replace && !silent) {
+            return; // don't handle because no matter
+        }
         let paramIndex = url.indexOf("?");
         let handler = this.urlMap.get(paramIndex < 0 ? url : url.substring(0, paramIndex));
         if (handler) {
@@ -55,8 +59,8 @@ export class Router {
                 }
             }
             handler(url, paramIndex)
-                .then(() => progress.hide())
-                .catch(e => console.error(`Unhandled error (navigateTo) - ${e}`));
+                .then(() => {progress.hide(); window.scrollTo(0, 0)})
+                .catch(e => console.error(`Unhandled error (navigateTo) - ${e.stack}`));
         } else if (this.options && this.options.page404) {
             this.options.page404(url)
                 .catch(e => console.error(`Unhandled error ${e}`));
@@ -65,11 +69,25 @@ export class Router {
         }
     }
 
+    forceNavigateTo(url, silent= false, replace = false) {
+        this.navigateTo(url, silent, replace, true);
+    }
+
     startListener() {
         window.onpopstate = () => this.popstateBinder();
     }
 
     popstateBinder() {
-        this.navigateTo(window.location.pathname, true);
+        this.navigateTo(this.ejectPathNameWithParams(), true);
+    }
+
+    ejectPathNameWithParams() {
+        let link = window.location.pathname;
+        let index = window.location.href.indexOf("?");
+        return index > 0 ? link + window.location.href.substring(index) : link;
+    }
+
+    updateCurrent() {
+        this.navigateTo(this.ejectPathNameWithParams(), false, true, true);
     }
 }

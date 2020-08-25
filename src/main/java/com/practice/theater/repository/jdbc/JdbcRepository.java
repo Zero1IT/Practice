@@ -51,4 +51,9 @@ public abstract class JdbcRepository<K extends Serializable, T> extends GenericJ
     public void remove(T model) {
         deleteByPrimaryKeyInstance(model);
     }
+
+    @Override
+    public List<T> pagination(long limit, long offset) {
+        return paginationSelect(limit, offset);
+    }
 }

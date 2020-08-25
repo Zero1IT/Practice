@@ -1,4 +1,4 @@
-package com.practice.web.services.interfaces;
+package com.practice.web.services;
 
 import java.util.Optional;
 

@@ -1,10 +1,10 @@
-package com.practice.web.services;
+package com.practice.web.services.impl;
 
 import com.practice.theater.ServiceLocator;
 import com.practice.theater.models.Role;
 import com.practice.theater.repository.UserRepository;
 import com.practice.web.dto.UserDto;
-import com.practice.web.services.interfaces.UserService;
+import com.practice.web.services.UserService;
 
 import java.util.Collections;
 import java.util.List;

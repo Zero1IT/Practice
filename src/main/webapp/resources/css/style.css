@@ -229,7 +229,109 @@ button, input[type=submit] {
 
 /** PlayOrder page **/
 
+.order-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
 
+.play-map-wrapper ul {
+    margin: 10px;
+}
+
+.play-map-wrapper ul>li {
+    background-color: #ff614e;
+    border-radius: 10px;
+    cursor: pointer;
+    display: inline-block;
+    padding: 10px;
+    margin: 5px;
+}
+
+.play-map-wrapper ul>li:hover {
+    background-color: #4b7a52;
+}
+
+.play-map-wrapper .selected {
+    background-color: #4b7a52;
+}
+
+.create-order-wrapper {
+    display: flex;
+}
+
+.schema {
+    border: #4b7a52 solid 5px;
+    display: inline-block;
+    padding: 20px;
+}
+
+.custom-checkbox-wrapper {
+    display: inline-block;
+}
+
+.place-box:checked ~ .custom-box {
+    background-color: #08bb68;
+}
+
+.custom-box, .custom-box-disabled {
+    border-radius: 5px;
+    display: block;
+    font-size: 8pt;
+    height: 20px;
+    margin: 2px;
+    position: relative;
+    text-align: center;
+    width: 20px;
+}
+
+.custom-box-disabled {
+    color: #ebebeb;
+}
+
+.custom-box {
+    background-color: #ddd;
+    transition: background-color 0.5s;
+}
+
+.custom-box-disabled {
+    background: #414141;
+}
+
+.order-confirm-info {
+    display: none;
+    flex-flow: column;
+    padding: 20px;
+}
+
+.last-selected-info {
+    margin: 10px 0;
+}
+
+.last-selected-info>p {
+    display: inline-block;
+}
+
+.confirm-order-panel {
+    margin-top: auto;
+}
+
+.confirm-order-btn {
+    background-color: #3837a3;
+    border-radius: 10px;
+    border: none;
+    color: #ebebeb;
+    display: block;
+    margin: 0 auto;
+    outline: none;
+    padding: 5px 20px;
+    text-transform: uppercase;
+}
+
+.confirm-order-btn:hover {
+    background-color: #30b138;
+}
 
 /** login page **/
 /*background: #c8c8c8;*/

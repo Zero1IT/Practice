@@ -1,13 +1,29 @@
 {
+  "signPage": {
+    "in": "Sign In",
+    "up": "Sign Up",
+    "email": "Email address",
+    "password": "Password",
+    "keep": "Keep me Signed In",
+    "forgot": "Forgot Password?",
+    "username": "Username",
+    "phone": "Full phone number",
+    "repPass": "Repeat password",
+    "already": "Already Member?"
+  },
   "rootPage": {
     "lang": "Language",
     "profile": "Profile",
     "basket": "Basket",
-    "out": "Sign Out"
+    "out": "Sign Out",
+    "rights": "All right reserved",
+    "navUser": "Users",
+    "navOrder": "Orders panel"
   },
   "playPage": {
     "author": "Author",
     "genre": "Genre",
-    "dates": "Dates"
+    "dates": "Dates",
+    "title": "Title"
   }
 }

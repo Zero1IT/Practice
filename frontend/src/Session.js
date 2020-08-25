@@ -19,6 +19,11 @@ export class Session {
         }
     }
 
+    invalidateRefreshToken() {
+        this.refreshToken = null;
+        localStorage.removeItem(REFRESH_TOKEN_KEY);
+    }
+
     /**
      * Loading session data
      * @param token {{refresh: String, access: String}} - object represent jwt tokens

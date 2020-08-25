@@ -1,6 +1,7 @@
 package com.practice.web;
 
 import com.practice.web.config.*;
+import com.practice.web.config.security.AuthAccess;
 import com.practice.web.config.security.Authorize;
 import com.practice.web.config.security.WebAuthorize;
 import com.practice.web.dto.JwtPayload;
@@ -73,12 +74,15 @@ public class Router implements RequestResolver {
 
     private boolean preventAccess(HttpServletRequest req, HttpServletResponse resp, AnnotatedElement element) throws IOException {
         if (auth != null && element.isAnnotationPresent(Authorize.class)) {
-            if (auth.allowAccess(req, resp, element.getAnnotation(Authorize.class))) {
+            AuthAccess access = auth.allowAccess(req, resp, element.getAnnotation(Authorize.class));
+            if (access == AuthAccess.ALLOW_ACCESS) {
                 return false;
+            } else if (access == AuthAccess.PREVENT_ACCESS) {
+                resp.sendError(HttpServletResponse.SC_FORBIDDEN);
             } else {
                 resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-                return true;
             }
+            return true;
         }
         return false;
     }
@@ -113,7 +117,7 @@ public class Router implements RequestResolver {
         handlers.put(controllerUrl, new Handler(controller));
     }
 
-    private String ejectControllerUrl(Object controller) {
+    private static String ejectControllerUrl(Object controller) {
         Class<?> cl = controller.getClass();
         WebController annotation = cl.getAnnotation(WebController.class);
         String result;
@@ -194,16 +198,23 @@ public class Router implements RequestResolver {
                     args[i] = auth.getAuthentication(req, resp);
                 } else {
                     param = map.get(parameters[i].getType());
-                    args[i] = param == null ? ejectGetParameter(req, parameters[i]) : param;
+                    args[i] = param == null ? ejectWebParameter(req, parameters[i]) : param;
                 }
             }
 
             return args;
         }
 
-        private String ejectGetParameter(HttpServletRequest req, Parameter methodParameter) {
+        private Object ejectWebParameter(HttpServletRequest req, Parameter methodParameter) {
             WebParam param = methodParameter.getAnnotation(WebParam.class);
-            return param != null ? req.getParameter(param.value()) : null;
+            if (param != null) {
+                return req.getParameter(param.value());
+            }
+            WebBody body = methodParameter.getAnnotation(WebBody.class);
+            if (body != null) {
+                return JsonUtils.parseRequest(req, methodParameter.getType()).orElse(null);
+            }
+            return null;
         }
 
         private boolean isRightMethod(String url, String method, Map.Entry<String, Method> entry) {

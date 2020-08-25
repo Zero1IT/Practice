@@ -1,6 +1,6 @@
-package com.practice.web.services;
+package com.practice.web.services.impl;
 
-import com.practice.web.services.interfaces.*;
+import com.practice.web.services.*;
 
 public class ServiceFactoryImpl implements ServiceFactory {
 
@@ -8,6 +8,8 @@ public class ServiceFactoryImpl implements ServiceFactory {
     private TokenService tokenService;
     private UserService userService;
     private PlayService playService;
+    private TheaterConstructionService constructionService;
+    private OrderService orderService;
 
     @Override
     public TokenService tokenService() {
@@ -27,5 +29,15 @@ public class ServiceFactoryImpl implements ServiceFactory {
     @Override
     public PlayService playService() {
         return playService != null ? playService : (playService = new PlayServiceImpl());
+    }
+
+    @Override
+    public TheaterConstructionService theaterConstructionService() {
+        return constructionService != null ? constructionService : (constructionService = new TheaterConstructionServiceImpl());
+    }
+
+    @Override
+    public OrderService orderService() {
+        return orderService != null ? orderService : (orderService = new OrderServiceImpl());
     }
 }

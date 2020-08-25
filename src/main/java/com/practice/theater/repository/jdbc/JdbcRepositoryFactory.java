@@ -9,7 +9,12 @@ public class JdbcRepositoryFactory implements RepositoryFactory {
     private PlayDateRepository playDateRepository;
     private PlayRepository playRepository;
     private UserRepository userRepository;
-    private JdbcTokenRepository jdbcTokenRepository;
+    private TokenRepository tokenRepository;
+    private HallRepository hallRepository;
+    private HallRowRepository hallRowRepository;
+    private CategoryRepository categoryRepository;
+    private OrderRepository orderRepository;
+    private OrderPlaceRepository orderPlaceRepository;
 
     @Override
     public AuthorRepository authorRepository() {
@@ -37,7 +42,32 @@ public class JdbcRepositoryFactory implements RepositoryFactory {
     }
 
     @Override
-    public JdbcTokenRepository tokenRepository() {
-        return jdbcTokenRepository != null ? jdbcTokenRepository : (jdbcTokenRepository = new JdbcTokenRepository());
+    public TokenRepository tokenRepository() {
+        return tokenRepository != null ? tokenRepository : (tokenRepository = new JdbcTokenRepository());
+    }
+
+    @Override
+    public HallRepository hallRepository() {
+        return hallRepository != null ? hallRepository : (hallRepository = new JdbcHallRepository());
+    }
+
+    @Override
+    public HallRowRepository hallRowRepository() {
+        return hallRowRepository != null ? hallRowRepository : (hallRowRepository = new JdbcHallRowRepository());
+    }
+
+    @Override
+    public CategoryRepository categoryRepository() {
+        return categoryRepository != null ? categoryRepository : (categoryRepository = new JdbcCategoryRepository());
+    }
+
+    @Override
+    public OrderRepository orderRepository() {
+        return orderRepository != null ? orderRepository : (orderRepository = new JdbcOrderRepository());
+    }
+
+    @Override
+    public OrderPlaceRepository orderPlaceRepository() {
+        return orderPlaceRepository != null ? orderPlaceRepository : (orderPlaceRepository = new JdbcOrderPlaceRepository());
     }
 }

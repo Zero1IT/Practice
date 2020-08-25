@@ -14,8 +14,8 @@ import java.io.IOException;
 public class DispatcherServlet extends HttpServlet {
 
     private static final Logger LOGGER = LogManager.getLogger(DispatcherServlet.class);
-    private RequestResolver router;
-    private String rootView;
+    private RequestResolver router; // NOSONAR
+    private String rootView; // NOSONAR
 
     @Override
     public void init() {
@@ -32,7 +32,6 @@ public class DispatcherServlet extends HttpServlet {
             try {
                 router.resolve(req, resp);
             } catch (NotFoundRouteException e) {
-                //resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 req.getRequestDispatcher(rootView).include(req, resp);
             }
         }

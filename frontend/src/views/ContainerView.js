@@ -1,6 +1,7 @@
 import {View} from "./View";
 import {UserDto} from "../models/dto/UserDto";
-import {app, resources} from "../app";
+import {app, resources, Roles} from "../app";
+import {Navigator} from "../navigator";
 
 class ContainerView extends View {
 
@@ -21,19 +22,12 @@ class ContainerView extends View {
                 </div>
                 <nav class="header-nav">
                     <ul class="header-nav-links">
-                        <li><a>{Item 1}</a></li>
-                        <li><a>{Item 2}</a></li>
-                        <li><a>{Item 3}</a></li>
+                        ${this.generateHeaderNav()}
                     </ul>   
                 </nav>
                 <div class="header-sign">
                     <div class="user-profile-menu">
-                        <button class="sign-in-btn">${this.model ? this.model.name : "<a href='/sign'>Sign</a>"}</button>
-                        <ul class="profile-menu-list">
-                          <li class="profile-menu-item">${resources.strings.rootPage.profile}</li>
-                            <li class="profile-menu-item">${resources.strings.rootPage.basket}</li>
-                            <li class="profile-menu-item" id="sign_out">${resources.strings.rootPage.out}</li>
-                        </ul>
+                        ${this.model ? this.profileButton() : `<a href='${Navigator.SIGN}' class='sign-in-btn'>Sign</a>`}
                     </div>
                     <div class="language-selector" id="lang">
                         <span class="language-selector-nav">${resources.strings.rootPage.lang}</span>
@@ -50,12 +44,21 @@ class ContainerView extends View {
             <footer class="footer-menu">
                 <div class="social-links"></div>
                 <div class="copyright">
-                    <span><span class="copy-sign">&copy;</span> All right reserved</span>
+                    <span><span class="copy-sign">&copy;</span> ${resources.strings.rootPage.rights}</span>
                 </div>
                 <div class="footer-info"></div>
             </footer>`, "#root");
         this.setupHandlers();
         return this.container;
+    }
+
+    profileButton() {
+        return `<button class="sign-in-btn">${this.model.name}</button>
+                <ul class="profile-menu-list">
+                    <li class="profile-menu-item">${resources.strings.rootPage.profile}</li>
+                    <li class="profile-menu-item">${resources.strings.rootPage.basket}</li>
+                    <li class="profile-menu-item" id="sign_out">${resources.strings.rootPage.out}</li>
+                </ul>`;
     }
 
     setupHandlers() {
@@ -68,12 +71,51 @@ class ContainerView extends View {
             item.addEventListener("click",
                 async (e) => this.handler.handle(EVENT.loadResource, e.target.getAttribute("data-lang")));
         }
-        this.menuHandlers();
+        if (this.model) {
+            this.menuHandlers();
+        }
     }
 
     menuHandlers() {
         let signOut = document.getElementById("sign_out");
         signOut.addEventListener("click", async () => this.handler.handle(EVENT.signOut));
+    }
+
+    generateHeaderNav() {
+        const links = this.getRoleDependentLinks();
+        const result = [];
+        if (this.model) {
+            // noinspection FallThroughInSwitchStatementJS
+            switch (this.model.roleName) {
+                case Roles.ADMIN:
+                    result.push(...this.createLinkItem(Roles.ADMIN, links));
+                case Roles.COURIER:
+                    result.push(...this.createLinkItem(Roles.COURIER, links));
+                case Roles.USER:
+                    result.push(...this.createLinkItem(Roles.USER, links));
+            }
+        }
+        return result.join("\n");
+    }
+
+    getRoleDependentLinks() {
+        return {
+            [Roles.USER]: [],
+            [Roles.COURIER]: [
+                { name: resources.strings.rootPage.navOrder, url: Navigator.PANEL_ORDER }
+            ],
+            [Roles.ADMIN]: [
+                { name: resources.strings.rootPage.navUser, url: Navigator.PANEL_USERS }
+            ]
+        };
+    }
+
+    createLinkItem(key, links) {
+        const array = [];
+        for (let link of links[key]) {
+            array.push(`<li><a href="${link.url}">${link.name}</a></li>`);
+        }
+        return array;
     }
 }
 

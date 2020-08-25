@@ -1,4 +1,4 @@
-package com.practice.web.services.interfaces;
+package com.practice.web.services;
 
 import com.practice.theater.models.Role;
 import com.practice.web.dto.UserDto;

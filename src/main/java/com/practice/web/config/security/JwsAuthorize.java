@@ -8,13 +8,15 @@ import io.jsonwebtoken.Claims;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import static com.practice.web.config.security.AuthAccess.*;
+
 public class JwsAuthorize implements WebAuthorize<JwtPayload> {
 
     @Override
-    public boolean allowAccess(HttpServletRequest req, HttpServletResponse resp, Authorize authorize) {
+    public AuthAccess allowAccess(HttpServletRequest req, HttpServletResponse resp, Authorize authorize) {
         return  WebUtils.getAuthenticationHeader(req)
-                .map(jws -> isCanAccess(jws, authorize))
-                .orElse(false);
+                .map(jws -> canAccess(jws, authorize))
+                .orElse(UNAUTHORIZED);
     }
 
     @Override
@@ -25,13 +27,14 @@ public class JwsAuthorize implements WebAuthorize<JwtPayload> {
                 .orElse(null);
     }
 
-    private boolean isCanAccess(String jws, Authorize authorize) {
+    private static AuthAccess canAccess(String jws, Authorize authorize) {
         Claims claims = WebUtils.parseJwsPayload(jws);
         if (claims != null) {
             return JsonUtils.fromJson(claims.getSubject(), JwtPayload.class)
-                    .map(jwt -> jwt.getRole().compareTo(authorize.value()) >= 0)
-                    .orElse(false);
+                    .filter(jwt -> jwt.getRole().compareTo(authorize.value()) >= 0)
+                    .map(jwt -> ALLOW_ACCESS)
+                    .orElse(PREVENT_ACCESS);
         }
-        return false;
+        return UNAUTHORIZED;
     }
 }

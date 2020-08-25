@@ -1,7 +1,6 @@
 package com.practice.theater.repository;
 
 import com.practice.theater.repository.jdbc.JdbcRepositoryFactory;
-import com.practice.theater.repository.jdbc.JdbcTokenRepository;
 
 public interface RepositoryFactory {
 
@@ -14,5 +13,10 @@ public interface RepositoryFactory {
     PlayDateRepository playDateRepository();
     PlayRepository playRepository();
     UserRepository userRepository();
-    JdbcTokenRepository tokenRepository();
+    TokenRepository tokenRepository();
+    HallRepository hallRepository();
+    HallRowRepository hallRowRepository();
+    CategoryRepository categoryRepository();
+    OrderRepository orderRepository();
+    OrderPlaceRepository orderPlaceRepository();
 }

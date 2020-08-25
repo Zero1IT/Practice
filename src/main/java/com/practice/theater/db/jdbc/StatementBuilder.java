@@ -106,6 +106,17 @@ public class StatementBuilder implements StatementCreator {
         return "SELECT COUNT(*) FROM " + tableName;
     }
 
+    @Override
+    public String paginationStatement(String table, String primaryKey, long limit, long offset) {
+        return String.format("select * from %s order by %s DESC limit %d,%d", table, primaryKey, offset, limit);
+    }
+
+    @Override
+    public String paginationConditionStatement(String table, String primaryKey, long limit, long offset, String column) {
+        return String.format("select * from %s where %s=? order by %s DESC limit %d,%d",
+                table, column, primaryKey, offset, limit);
+    }
+
     public static class StatementHelperProxy implements InvocationHandler {
         private final StatementCreator creator;
 
@@ -116,7 +127,7 @@ public class StatementBuilder implements StatementCreator {
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             Object result = method.invoke(creator, args);
-            //LOGGER.debug(result);
+            LOGGER.debug(result);
             return result;
         }
     }

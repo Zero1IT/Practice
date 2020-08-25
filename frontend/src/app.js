@@ -6,7 +6,7 @@ import {Session} from "./Session";
 
 /**
  * @typedef {{
- *     strings: {rootPage: *, playPage: *, preloader: *}
+ *     strings: {rootPage: *, signPage: *, playPage: *}
  * }} LangRes
  *
  * @type {LangRes}
@@ -15,14 +15,18 @@ const resources = {
     strings: {}
 };
 
+const Roles = {
+    USER: "USER",
+    COURIER: "COURIER",
+    ADMIN: "ADMIN"
+};
+
 const URLS = {
-    login: "/api/sign/login",
-    registration: "/api/sign/registration",
-    getNewPlays: "/api/plays/future",
-    userInfo: "/api/users/info",
-    refreshToken: "/api/sign/refresh-token",
-    loadLanguage: "/api/sign/lang",
-    signOut: "/api/sign/sign-out",
+    login: "/api/sign/login", registration: "/api/sign/registration", getNewPlays: "/api/plays/future",
+    getPlays: "/api/plays", userInfo: "/api/users/info", refreshToken: "/api/sign/refresh-token",
+    loadLanguage: "/api/sign/lang", signOut: "/api/sign/sign-out", loadHalls: "/api/construction/halls",
+    rowsInfo: "/api/construction/rows/info", categories: "/api/construction/category",
+    commitOrder: "/api/orders/commit",
 };
 
 const LOCALE = {
@@ -64,10 +68,10 @@ class App {
         if (this.isInitialized) {
             throw new Error("App has already initialized");
         }
-        await loadResources();
-        await this.session.tryUpdateTokens();
         this.router = createRouter(this);
-        this.router.navigateTo(window.location.pathname, true);
+        await this.session.tryUpdateTokens();
+        await loadResources();
+        this.router.navigateTo(this.router.ejectPathNameWithParams(), true);
         this.isInitialized = true;
         progress.hide();
     }
@@ -81,7 +85,7 @@ class App {
             if (key === lc) {
                 this.locale = LOCALE[key];
                 await loadResources(key);
-                this.router.navigateTo(window.location.pathname, false, true);
+                this.router.navigateTo(this.router.ejectPathNameWithParams(), false, true);
                 return;
             }
         }
@@ -117,5 +121,6 @@ export {
     App,
     app,
     URLS,
-    resources
+    resources,
+    Roles
 }

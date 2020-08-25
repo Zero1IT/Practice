@@ -10,17 +10,16 @@ import org.apache.logging.log4j.Logger;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
 import java.util.Optional;
 
 public final class JsonUtils {
 
     private static final Logger LOGGER = LogManager.getLogger(JsonUtils.class);
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     public static <T> Optional<T> parseRequest(HttpServletRequest req, Class<T> cl) {
         try {
-            return Optional.of(mapper.readValue(req.getReader(), cl));
+            return Optional.of(MAPPER.readValue(req.getReader(), cl));
         } catch (IOException e) {
             LOGGER.error(e);
             return Optional.empty();
@@ -29,7 +28,7 @@ public final class JsonUtils {
 
     public static <T> Optional<T> parseRequest(HttpServletRequest req, TypeReference<T> type) {
         try {
-            return Optional.of(mapper.readValue(req.getReader(), type));
+            return Optional.of(MAPPER.readValue(req.getReader(), type));
         } catch (IOException e) {
             LOGGER.error(e);
             return Optional.empty();
@@ -38,7 +37,7 @@ public final class JsonUtils {
 
     public static String toJson(Object object) {
         try {
-            return mapper.writeValueAsString(object);
+            return MAPPER.writeValueAsString(object);
         } catch (JsonProcessingException e) {
             LOGGER.error(e);
             return "";
@@ -47,7 +46,7 @@ public final class JsonUtils {
 
     public static <T> Optional<T> fromJson(String json, Class<T> cl) {
         try {
-            return Optional.of(mapper.readValue(json, cl));
+            return Optional.of(MAPPER.readValue(json, cl));
         } catch (IOException e) {
             LOGGER.error(e);
             return Optional.empty();
@@ -55,7 +54,7 @@ public final class JsonUtils {
     }
 
     public static JsonNode asJsonNode(InputStream stream) throws IOException {
-        return mapper.readValue(stream, JsonNode.class);
+        return MAPPER.readValue(stream, JsonNode.class);
     }
 
     private JsonUtils() {}

@@ -4,7 +4,7 @@ export class Controller {
      * Handle view event
      * @param eventType - type of event (some constant understandable for Controller)
      * @param data - some model understandable for Controller
-     * @return {Promise<void>} - promise is handling inside view
+     * @return {Promise<*>} - promise is handling inside view
      */
     async handle(eventType, data = null) {
         throw new Error("Handler isn't support");
@@ -12,9 +12,10 @@ export class Controller {
 
     /**
      * Loads data for view, and return it
+     * @param args {*=}
      * @return {Promise<*>} - promise is wrapping some model
      */
-    async init() {
+    async init(args) {
         throw new Error("Controller doesn't support init()")
     }
 }

@@ -1,7 +1,7 @@
 import {View} from "./View";
 import {LoginDto} from "../models/dto/LoginDto";
 import {RegistrationDto} from "../models/dto/RegistrationDto";
-import {app} from "../app";
+import {app, resources} from "../app";
 
 class SignView extends View {
 
@@ -18,64 +18,64 @@ class SignView extends View {
         await this._render(`
             <div class="login-wrap">
                 <div class="login-html">
-                    <input id="tab-1" type="radio" name="tab" class="sign-in" checked><label for="tab-1" class="tab">Sign In</label>
-                    <input id="tab-2" type="radio" name="tab" class="sign-up"><label for="tab-2" class="tab">Sign Up</label>
+                    <input id="tab-1" type="radio" name="tab" class="sign-in" checked><label for="tab-1" class="tab">${resources.strings.signPage.in}</label>
+                    <input id="tab-2" type="radio" name="tab" class="sign-up"><label for="tab-2" class="tab">${resources.strings.signPage.up}</label>
                     <div class="login-form">
                         <div class="sign-in-htm">
                             <div class="group">
-                                <label for="s_email" class="group-label">Email</label>
+                                <label for="s_email" class="group-label">${resources.strings.signPage.email}</label>
                                 <input id="s_email" type="text" class="form-input">
                                 <span class="error-highlight"></span>
                             </div>
                             <div class="group">
-                                <label for="s_pass" class="group-label">Password</label>
+                                <label for="s_pass" class="group-label">${resources.strings.signPage.password}</label>
                                 <input id="s_pass" type="password" class="form-input" data-type="password">
                                 <span class="error-highlight"></span>
                             </div>
                             <div class="group">
                                 <input id="s_check" type="checkbox" class="check" checked>
-                                <label for="s_check"><span class="icon"></span> Keep me Signed in</label>
+                                <label for="s_check"><span class="icon"></span> ${resources.strings.signPage.keep}</label>
                             </div>
                             <div class="group">
-                                <input type="submit" class="accept-form-button" value="Sign In">
+                                <input type="submit" class="accept-form-button" value="${resources.strings.signPage.in}">
                             </div>
                             <div class="hr"></div>
                             <div class="foot-lnk">
-                                <a href="#">Forgot Password?</a>
+                                <a href="#">${resources.strings.signPage.forgot}</a>
                             </div>
                         </div>
                         <div class="sign-up-htm">
                             <div class="group">
-                                <label for="username" class="group-label">Username</label>
+                                <label for="username" class="group-label">${resources.strings.signPage.username}</label>
                                 <input id="username" type="text" class="form-input">
                                 <span class="error-highlight"></span>
                             </div>
                             <div class="group">
-                                <label for="email" class="group-label">Email Address</label>
+                                <label for="email" class="group-label">${resources.strings.signPage.email}</label>
                                 <input id="email" type="text" class="form-input">
                                 <span class="error-highlight"></span>
                             </div>
                             <div class="group">
-                                <label for="phone" class="group-label">Full phone number</label>
+                                <label for="phone" class="group-label">${resources.strings.signPage.phone}</label>
                                 <input id="phone" type="text" class="form-input">
                                 <span class="error-highlight"></span>
                             </div>
                             <div class="group">
-                                <label for="pass" class="group-label">Password</label>
+                                <label for="pass" class="group-label">${resources.strings.signPage.password}</label>
                                 <input id="pass" type="password" class="form-input" data-type="password">
                                 <span class="error-highlight"></span>
                             </div>
                             <div class="group">
-                                <label for="repeat" class="group-label">Repeat Password</label>
+                                <label for="repeat" class="group-label">${resources.strings.signPage.repPass}</label>
                                 <input id="repeat" type="password" class="form-input" data-type="password">
                                 <span class="error-highlight"></span>
                             </div>
                             <div class="group">
-                                <input type="submit" class="accept-form-button" value="Sign Up">
+                                <input type="submit" class="accept-form-button" value="${resources.strings.signPage.up}">
                             </div>
                             <div class="hr"></div>
                             <div class="foot-lnk">
-                                <a href="#">Already Member?</a>
+                                <a href="#">${resources.strings.signPage.already}</a>
                             </div>
                         </div>
                     </div>

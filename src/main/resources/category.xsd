@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="description">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="categories" type="CategoriesType" />
+                <xs:element name="halls" type="HallType" />
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:complexType name="CategoriesType">
+        <xs:sequence>
+            <xs:element name="category" type="CategoryType" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="CategoryType">
+        <xs:attribute name="name" type="xs:string" />
+        <xs:attribute name="price" type="PriceType" />
+    </xs:complexType>
+
+    <xs:simpleType name="PriceType">
+        <xs:restriction base="xs:decimal">
+            <xs:pattern value="^\d{1,8}\.(?=\d\d?)$" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="HallType">
+        <xs:sequence>
+            <xs:element name="hall" type="RowsType" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="RowsType">
+        <xs:sequence>
+            <xs:element name="row" type="RowType" maxOccurs="unbounded" />
+        </xs:sequence>
+        <xs:attribute name="name" type="xs:string" use="required" />
+    </xs:complexType>
+
+    <xs:complexType name="RowType">
+        <xs:attribute name="number" type="xs:integer" use="required" />
+        <xs:attribute name="count" type="xs:integer" use="required" />
+        <xs:attribute name="category" type="xs:string" use="required" />
+        <xs:attribute name="hint" type="xs:string" />
+    </xs:complexType>
+</xs:schema>

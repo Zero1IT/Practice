@@ -1,10 +1,10 @@
-package com.practice.web.services;
+package com.practice.web.services.impl;
 
 import com.practice.theater.ServiceLocator;
 import com.practice.theater.Utils;
 import com.practice.theater.models.User;
 import com.practice.theater.repository.UserRepository;
-import com.practice.web.services.interfaces.SignService;
+import com.practice.web.services.SignService;
 import com.practice.web.dto.CredentialsDto;
 
 import java.util.concurrent.atomic.AtomicLong;

@@ -8,14 +8,19 @@ import {PlayController} from "./controllers/PlayController";
 import {PlayView} from "./views/PlayView";
 import {App} from "./app";
 import {ContainerController} from "./controllers/ContainerController";
+import {OrderView} from "./views/OrderView";
+import {OrderController} from "./controllers/OrderController";
 
-const NAVIGATOR = {
-    HOME: "/",
-    SIGN: "/sign",
-    PLAY: "/plays/order"
+const Navigator = {
+    HOME: "/", SIGN: "/sign", PLAY: "/plays/order",
+    PANEL_USERS: "/panel/users",
+    PANEL_ORDER: "/panel/orders"
 };
 
 const containerController = new ContainerController();
+const orderController = new OrderController();
+const signController = new SignController();
+const playController = new PlayController();
 
 /**
  * @param app {App}
@@ -45,20 +50,26 @@ function createRouter(app) {
         }
     });
 
-    router.add(NAVIGATOR.HOME, async () => {
+    router.add(Navigator.HOME, async () => {
         let playView = new PlayView(getContainerView());
-        playView.setHandler(new PlayController());
+        playView.setHandler(playController);
         await playView.render();
     });
 
-    router.add(NAVIGATOR.SIGN, async () => {
+    router.add(Navigator.SIGN, async () => {
         let sign = new SignView(getContainerView());
-        sign.setHandler(new SignController());
+        sign.setHandler(signController);
         await sign.render();
     });
 
-    router.add(NAVIGATOR.PLAY, async (url, i) => {
-        console.log(url.substring(i))
+    router.add(Navigator.PLAY, async (url) => {
+        let ord = new OrderView(getContainerView(), url);
+        ord.setHandler(orderController);
+        await ord.render();
+    });
+
+    router.add(Navigator.PANEL_ORDER, async () => {
+
     });
 
     router.startListener();
@@ -66,6 +77,6 @@ function createRouter(app) {
 }
 
 export {
-    NAVIGATOR,
+    Navigator,
     createRouter,
 }

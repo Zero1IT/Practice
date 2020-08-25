@@ -3,7 +3,7 @@ import {EVENT} from "../views/SignView";
 import {LoginDto} from "../models/dto/LoginDto";
 import {RegistrationDto} from "../models/dto/RegistrationDto";
 import {app, URLS} from "../app";
-import {NAVIGATOR} from "../navigator";
+import {Navigator} from "../navigator";
 
 export class SignController extends Controller {
 
@@ -39,7 +39,7 @@ export class SignController extends Controller {
         if (response.ok) {
             let json = await response.json();
             await app.acceptJwtToken(json);
-            app.router.navigateTo(NAVIGATOR.HOME, false, true);
+            app.router.navigateTo(Navigator.HOME, false, true);
         } else {
             throw new Error(`${response.status}`);
         }

@@ -10,6 +10,7 @@ public interface Repository<K extends Serializable, T> {
     <S extends T> void addAll(Collection<S> models);
     Optional<T> getById(K id);
     List<T> getAll();
+    List<T> pagination(long limit, long offset);
     boolean update(T model);
     boolean existsWithId(K id);
     void removeById(K id);

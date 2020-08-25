@@ -1,6 +1,6 @@
-package com.practice.web.services.interfaces;
+package com.practice.web.services;
 
-import com.practice.web.services.ServiceFactoryImpl;
+import com.practice.web.services.impl.ServiceFactoryImpl;
 
 public interface ServiceFactory {
 
@@ -12,4 +12,6 @@ public interface ServiceFactory {
     TokenService tokenService();
     UserService userService();
     PlayService playService();
+    TheaterConstructionService theaterConstructionService();
+    OrderService orderService();
 }

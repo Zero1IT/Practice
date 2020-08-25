@@ -1,4 +1,4 @@
-package com.practice.web.services;
+package com.practice.web.services.impl;
 
 import com.practice.theater.ServiceLocator;
 import com.practice.theater.models.Play;
@@ -7,7 +7,7 @@ import com.practice.theater.repository.PlayDateRepository;
 import com.practice.theater.repository.PlayRepository;
 import com.practice.web.dto.LitePlayDateDto;
 import com.practice.web.dto.PlayWithDatesDto;
-import com.practice.web.services.interfaces.PlayService;
+import com.practice.web.services.PlayService;
 
 import java.time.Instant;
 import java.util.List;
@@ -32,6 +32,13 @@ public class PlayServiceImpl implements PlayService {
                 .map(p -> toPlayWithDates(p, date))
                 .filter(PlayWithDatesDto::hasDates)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public PlayWithDatesDto getActualPlayById(long id) {
+        return repository.getById(id)
+                .map(p -> toPlayWithDates(p, Instant.now()))
+                .orElse(null);
     }
 
     private PlayWithDatesDto toPlayWithDates(Play play, Instant date) {

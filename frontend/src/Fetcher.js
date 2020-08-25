@@ -46,6 +46,8 @@ export class Fetcher {
         });
         if (this.clearResponse(response)) {
             await app.acceptJwtToken(await response.json());
+        } else {
+            app.session.invalidateRefreshToken();
         }
     }
 
@@ -59,7 +61,7 @@ export class Fetcher {
         if (response.ok || excludedCodes.includes(response.status)) {
             return response;
         }
-
+        console.error(response.status);
         switch (response.status) {
             case statusCodes.UNAUTHORIZED:
                 // TODO: wasn't authorized
