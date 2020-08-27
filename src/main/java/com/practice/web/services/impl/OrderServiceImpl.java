@@ -1,6 +1,7 @@
 package com.practice.web.services.impl;
 
 import com.practice.theater.ServiceLocator;
+import com.practice.theater.custom.Pair;
 import com.practice.theater.db.exceptions.DatabaseException;
 import com.practice.theater.models.Order;
 import com.practice.theater.models.OrderPlace;
@@ -9,8 +10,9 @@ import com.practice.theater.models.User;
 import com.practice.theater.models.xml.Category;
 import com.practice.theater.models.xml.HallRow;
 import com.practice.theater.repository.*;
-import com.practice.web.dto.CompletedOrderDto;
 import com.practice.web.dto.OrderDto;
+import com.practice.web.dto.ClientOrderDto;
+import com.practice.web.dto.OrderInfoDto;
 import com.practice.web.dto.PlaceDto;
 import com.practice.web.services.OrderService;
 import org.apache.logging.log4j.LogManager;
@@ -35,7 +37,7 @@ public class OrderServiceImpl implements OrderService {
     private final PlayDateRepository playDateRepository = factory.playDateRepository();
 
     @Override
-    public CompletedOrderDto commitOrder(OrderDto dto, long userId) {
+    public OrderDto commitOrder(ClientOrderDto dto, long userId) {
         List<PlaceDto> places = dto.getPlaces();
         if (places != null && !places.isEmpty()) {
             List<HallRow> rows = rowRepository.getById(places.get(0).getRowId())
@@ -44,7 +46,7 @@ public class OrderServiceImpl implements OrderService {
             if (checkCorrectPlaceNumber(places, rows)) {
                 Order order = orderToDatabase(dto, rows, userId);
                 if (order != null) {
-                    return CompletedOrderDto.from(order);
+                    return OrderDto.from(order);
                 }
             }
         }
@@ -52,18 +54,63 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<CompletedOrderDto> actualOrders(long limit, long offset) {
+    public List<OrderDto> actualOrders(long limit, long offset) {
         if (limit <= 0 || offset < 0) {
             return orderRepository.getNotConfirmedOrders().stream()
-                    .map(CompletedOrderDto::from)
+                    .map(OrderDto::from)
                     .collect(toList());
         }
         return orderRepository.getNotConfirmedOrders(limit, offset).stream()
-                .map(CompletedOrderDto::from)
+                .map(OrderDto::from)
                 .collect(toList());
     }
 
-    private Order orderToDatabase(OrderDto dto, List<HallRow> rows, long userId) {
+    @Override
+    public OrderDto takeOrder(long orderId, long courierId) {
+        Optional<Order> orderOptional = orderRepository.getById(orderId);
+        if (orderOptional.isPresent()) {
+            Order order = orderOptional.get();
+            if (order.getCourier() == null) {
+                Optional<User> userOptional = userRepository.getById(courierId);
+                if (userOptional.isPresent()) {
+                    order.setCourier(userOptional.get());
+                    if (orderRepository.update(order)) {
+                        return OrderDto.from(order);
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public OrderDto acceptPayment(long orderId, long courierId) {
+        Optional<Order> orderOptional = orderRepository.get(orderId, courierId);
+        if (orderOptional.isPresent()) {
+            Order order = orderOptional.get();
+            order.setPaid(true);
+            order.setConfirmed(true);
+            if (orderRepository.update(order)) {
+                return OrderDto.from(order);
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public long actualOrdersCount() {
+        return orderRepository.notConfirmedOrdersCount();
+    }
+
+    @Override
+    public OrderInfoDto getOrderInfo(long orderId) {
+        List<Pair<Category, Integer>> categoriesInOrder = categoryRepository.getCategoriesOfOrder(orderId);
+        OrderInfoDto dto = new OrderInfoDto();
+        dto.setCategoriesOfOrder(categoriesInOrder);
+        return dto;
+    }
+
+    private Order orderToDatabase(ClientOrderDto dto, List<HallRow> rows, long userId) {
         Optional<Order> orderOpt = userRepository.getById(userId)
                 .map(u -> createOrder(dto.getPlaces(), rows, u));
         if (orderOpt.isPresent()) {

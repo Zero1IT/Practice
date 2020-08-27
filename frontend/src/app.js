@@ -26,7 +26,9 @@ const URLS = {
     getPlays: "/api/plays", userInfo: "/api/users/info", refreshToken: "/api/sign/refresh-token",
     loadLanguage: "/api/sign/lang", signOut: "/api/sign/sign-out", loadHalls: "/api/construction/halls",
     rowsInfo: "/api/construction/rows/info", categories: "/api/construction/category",
-    commitOrder: "/api/orders/commit",
+    commitOrder: "/api/orders/commit", actualOrders: "/api/orders/actual",
+    actualOrdersCount: "/api/orders/actual/count", ordersCategoryInfo: "/api/orders/info",
+    takeOrder: "/api/orders/take",
 };
 
 const LOCALE = {

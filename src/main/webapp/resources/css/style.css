@@ -98,7 +98,10 @@ button, input[type=submit] {
 }
 
 .language-selector:hover .language-selector-nav::after {
-    box-shadow: 2px -2px 0 black;
+    -o-transform: rotate(135deg);
+    -webkit-transform: rotate(135deg);
+    -moz-transform: rotate(135deg);
+    top: 50%;
 }
 
 .language-list {
@@ -333,7 +336,204 @@ button, input[type=submit] {
     background-color: #30b138;
 }
 
-/** login page **/
+/** Order panel page **/
+
+.panel-wrapper {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.o-p-item {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 10px 10px rgba(0, 0, 0, 0.2);
+    display: flex;
+    max-width: 100%;
+    overflow: hidden;
+    width: 700px;
+    margin: 30px 0;
+}
+
+.o-p-item h6 {
+    opacity: 0.6;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.o-p-item h2 {
+    letter-spacing: 1px;
+    margin: 10px 0;
+}
+
+.o-p-item-preview {
+    background: #e40046;
+    color: #fff;
+    padding: 30px;
+    width: 250px;
+    position: relative;
+}
+
+.o-p-item-preview a {
+    color: #fff;
+    font-size: 12px;
+    opacity: 0.6;
+    margin-top: 30px;
+}
+
+.o-p-item-info {
+    padding: 30px 30px 10px;
+    position: relative;
+    width: 100%;
+}
+
+.o-p-item-info p {
+    font-size: 12px;
+    font-weight: bold;
+    padding: 5px 0;
+}
+
+.o-p-item-play {
+    margin-bottom: 10px;
+}
+
+.o-p-item-btn {
+    background-color: #e40046;
+    border: 1px solid transparent;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    color: #fff;
+    font-size: 16px;
+    padding: 10px 20px;
+    letter-spacing: 1px;
+    transition: all 0.4s ease-in-out;
+    font-weight: bold;
+    border-radius: 20px;
+    margin: 10px;
+}
+
+.o-p-item-btn:hover {
+    background-color: #fff;
+    color: #e40046;
+    border: 1px solid #e40046;
+    transform: scale(1.05);
+}
+
+.o-p-info-payload {
+    height: 0;
+    overflow: hidden;
+    transition: height 0.5s;
+    color: #000;
+}
+
+.o-p-ticket-info>label {
+    position: relative;
+    font-size: 14pt;
+    cursor: pointer;
+}
+
+.o-p-ticket-info>label::after {
+    box-shadow: -2px 2px 0 black;
+    content: "";
+    display: block;
+    height: 10px;
+    position: absolute;
+    top: 0;
+    right: -15px;
+    width: 10px;
+    -o-transform: rotate(-45deg);
+    -webkit-transform: rotate(-45deg);
+    -moz-transform: rotate(-45deg);
+}
+
+.o-p-ticket-info>input:checked ~ label::after {
+    top: 50%;
+    -o-transform: rotate(135deg);
+    -webkit-transform: rotate(135deg);
+    -moz-transform: rotate(135deg);
+}
+
+.o-p-ticket-info>input:checked ~ .o-p-info-payload {
+    overflow: auto;
+    height: 100px;
+}
+
+.page-nav {
+    margin: 0 auto;
+    width: max-content;
+}
+
+.page-nav>li {
+    background-color: #32ff0a;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    font-weight: bold;
+    cursor: pointer;
+    display: inline-block;
+    padding: 10px 20px;
+}
+
+.page-nav>li:hover {
+    background-color: #fff;
+    border: 1px solid #32ff0a;
+}
+
+.selected-page {
+    background-color: #fff !important;
+    border: 1px solid #32ff0a !important;
+}
+
+.o-p-paid {
+    display: inline-block;
+    position: relative;
+}
+
+.o-p-paid::after {;
+    box-shadow: -5px 5px 0 #2fc319;
+    content: "";
+    display: block;
+    height: 15px;
+    top: -7px;
+    right: -20px;
+    position: absolute;
+    width: 15px;
+    -o-transform: rotate(-45deg);
+    -webkit-transform: rotate(-45deg);
+    -moz-transform: rotate(-45deg);
+}
+
+@media (max-width: 770px) {
+    .o-p-item {
+        flex-direction: column;
+        width: 90%;
+    }
+
+    .o-p-item-preview {
+        width: 100%;
+    }
+
+    .o-p-item-preview h2 {
+        margin: 10px 0 0;
+    }
+
+    .o-p-item-preview a {
+        margin-top: 10px;
+    }
+
+    .o-p-item-info h2 {
+        margin-top: 20px;
+    }
+
+    .o-p-item-btn {
+        font-size: 14px;
+    }
+
+    .page-nav>li {
+        padding: 10px;
+    }
+}
+
+    /** login page **/
 /*background: #c8c8c8;*/
 
 .login-wrap {

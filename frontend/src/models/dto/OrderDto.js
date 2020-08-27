@@ -1,71 +1,94 @@
-class RowDto {
-    constructor(rowId, place) {
-        this._rowId = rowId;
-        this._place = place;
+import {UserDto} from "./UserDto";
+
+export class OrderDto {
+    /**
+     * @typedef {{
+     *  id: Number,
+     *  cost: Number,
+     *  quantity: Number,
+     *  user: UserDto,
+     *  courier: UserDto
+     *  confirmed: boolean
+     *  paid: boolean
+     *  date: {nano: Number, epochSecond: Number}
+     * }} JavaCompletedOrderDto
+     */
+
+    /**
+     * @param obj {JavaCompletedOrderDto}
+     */
+    constructor(obj) {
+        this._id = obj.id;
+        this._cost = obj.cost;
+        this._quantity = obj.quantity;
+        this._user = obj.user;
+        this._confirmed = obj.confirmed;
+        this._courier = obj.courier;
+        this._paid = obj.paid;
+        this._date = new Date(obj.date.epochSecond * 1000);
     }
 
-
-    get rowId() {
-        return this._rowId;
+    get id() {
+        return this._id;
     }
 
-    set rowId(value) {
-        this._rowId = value;
+    set id(value) {
+        this._id = value;
     }
 
-    get place() {
-        return this._place;
+    get cost() {
+        return this._cost;
     }
 
-    set place(value) {
-        this._place = value;
+    set cost(value) {
+        this._cost = value;
     }
 
-    toModel() {
-        return {
-            rowId: this.rowId,
-            place: this.place
-        };
-    }
-}
-
-class OrderDto {
-    constructor() {
-        /**
-         * @type {Number}
-         */
-        this._dateId = undefined;
-        /**
-         * @type {RowDto[]}
-         */
-        this._places = undefined;
+    get quantity() {
+        return this._quantity;
     }
 
-
-    get dateId() {
-        return this._dateId;
+    set quantity(value) {
+        this._quantity = value;
     }
 
-    set dateId(value) {
-        this._dateId = value;
+    get user() {
+        return this._user;
     }
 
-    get places() {
-        return this._places;
+    set user(value) {
+        this._user = value;
     }
 
-    set places(value) {
-        this._places = value;
+    get confirmed() {
+        return this._confirmed;
     }
 
-    toJson() {
-        return JSON.stringify({
-            dateId: this.dateId,
-            places: this.places.map(p => p.toModel())
-        });
+    set confirmed(value) {
+        this._confirmed = value;
     }
-}
 
-export {
-    RowDto, OrderDto
+    get courier() {
+        return this._courier;
+    }
+
+    set courier(value) {
+        this._courier = value;
+    }
+
+    get paid() {
+        return this._paid;
+    }
+
+    set paid(value) {
+        this._paid = value;
+    }
+
+    get date() {
+        return this._date;
+    }
+
+    set date(value) {
+        this._date = value;
+    }
 }

@@ -5,6 +5,7 @@ import com.practice.theater.db.annotations.Constraint;
 import com.practice.theater.db.annotations.Table;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 
 @Table(name = "Orders")
 public class Order {
@@ -19,10 +20,13 @@ public class Order {
     private int quantity;
     @Column(name = "confirmed")
     private boolean confirmed;
-    @Column(name = "taken")
-    private boolean taken;
     @Column(name = "paid")
     private boolean paid;
+    @Column(name = "createdAt")
+    private Instant date = Instant.now();
+    @Column(name = "courierId")
+    @Constraint(mappedBy = "id")
+    private User courier;
 
     public long getId() {
         return id;
@@ -64,19 +68,27 @@ public class Order {
         this.confirmed = confirmed;
     }
 
-    public boolean isTaken() {
-        return taken;
-    }
-
-    public void setTaken(boolean taken) {
-        this.taken = taken;
-    }
-
     public boolean isPaid() {
         return paid;
     }
 
     public void setPaid(boolean paid) {
         this.paid = paid;
+    }
+
+    public Instant getDate() {
+        return date;
+    }
+
+    public void setDate(Instant date) {
+        this.date = date;
+    }
+
+    public User getCourier() {
+        return courier;
+    }
+
+    public void setCourier(User courier) {
+        this.courier = courier;
     }
 }

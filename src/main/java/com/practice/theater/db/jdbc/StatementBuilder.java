@@ -66,13 +66,12 @@ public class StatementBuilder implements StatementCreator {
         builder.append(String.format("update %s set ", tableName));
         int index = 1;
         for (Map.Entry<Field, Column> entry : fieldsMap.entrySet()) {
-            index++;
             if (entry.getValue().isPrimaryKey()) {
                 primaryKeyName = entry.getValue().name();
             } else {
+                ++index;
                 builder.append(entry.getValue().name());
                 if (index < fieldsMap.size()) {
-                    System.out.println(index);
                     builder.append("=?, ");
                 }
             }
@@ -107,6 +106,11 @@ public class StatementBuilder implements StatementCreator {
     }
 
     @Override
+    public String countRowsWithConditionStatement(String tableName, String fieldName) {
+        return String.format("SELECT COUNT(*) FROM %s WHERE %s=?", tableName, fieldName);
+    }
+
+    @Override
     public String paginationStatement(String table, String primaryKey, long limit, long offset) {
         return String.format("select * from %s order by %s DESC limit %d,%d", table, primaryKey, offset, limit);
     }
@@ -127,7 +131,7 @@ public class StatementBuilder implements StatementCreator {
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             Object result = method.invoke(creator, args);
-            LOGGER.debug(result);
+            //LOGGER.debug(result);
             return result;
         }
     }

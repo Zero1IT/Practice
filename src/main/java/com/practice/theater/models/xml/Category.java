@@ -4,6 +4,7 @@ import com.practice.theater.db.annotations.Column;
 import com.practice.theater.db.annotations.Table;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 @Table(name = "TicketCategories")
 public class Category {
@@ -36,5 +37,19 @@ public class Category {
 
     public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Category category = (Category) o;
+        return Objects.equals(name, category.name) &&
+                Objects.equals(price, category.price);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, price);
     }
 }

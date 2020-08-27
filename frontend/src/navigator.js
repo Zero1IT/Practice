@@ -10,6 +10,7 @@ import {App} from "./app";
 import {ContainerController} from "./controllers/ContainerController";
 import {OrderView} from "./views/OrderView";
 import {OrderController} from "./controllers/OrderController";
+import {OrderPanelView} from "./views/OrderPanelView";
 
 const Navigator = {
     HOME: "/", SIGN: "/sign", PLAY: "/plays/order",
@@ -62,14 +63,16 @@ function createRouter(app) {
         await sign.render();
     });
 
-    router.add(Navigator.PLAY, async (url) => {
-        let ord = new OrderView(getContainerView(), url);
+    router.add(Navigator.PLAY, async (url, i) => {
+        let ord = new OrderView(getContainerView(), url.substring(i));
         ord.setHandler(orderController);
         await ord.render();
     });
 
-    router.add(Navigator.PANEL_ORDER, async () => {
-
+    router.add(Navigator.PANEL_ORDER, async (url, i) => {
+        let view = new OrderPanelView(getContainerView(), url.substring(i));
+        view.setHandler(orderController);
+        await view.render();
     });
 
     router.startListener();

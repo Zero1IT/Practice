@@ -13,6 +13,7 @@ public interface StatementCreator {
     String getAllStatement(String table);
     String updateStatement(String tableName, Map<Field, Column> fieldsMap);
     String countRowsStatement(String tableName);
+    String countRowsWithConditionStatement(String tableName, String fieldName);
     String paginationStatement(String table, String primaryKey, long limit, long offset);
     String paginationConditionStatement(String table, String primaryKey, long limit, long offset, String column);
 }

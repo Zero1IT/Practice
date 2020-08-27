@@ -3,7 +3,8 @@ import {PlayDto} from "../models/dto/PlayDto";
 import {resources, app} from "../app";
 import {HallMapViewPart} from "./parts/HallMapViewPart";
 import {showProgressOperation} from "../ProgressLoader";
-import {OrderDto, RowDto} from "../models/dto/OrderDto";
+import {NotExistsOrderDto, RowDto} from "../models/dto/NotExistsOrderDto";
+import {CategoryDto} from "../models/dto/CategoryDto";
 
 const urlDateRegx = /.+date=(\d+)/;
 
@@ -21,10 +22,10 @@ class OrderView extends View {
 
     async render() {
         /** @type {PlayDto} */
-        this.model = await this.handler.init(this.urlParams);
+        this.model = await this.handler.handle(EVENT.MODEL, this.urlParams);
         /** @type {Array<{id: Number, name: String}>} */
         this.halls = await this.handler.handle(EVENT.HALLS);
-        /** @type {Map<Number, {id: Number, name: String, price: Number}>} */
+        /** @type {Map<Number, CategoryDto>} */
         this.categories = await this.handler.handle(EVENT.CATEGORIES);
         if (this.model) {
             await this._render(this.viewHtml());
@@ -181,7 +182,7 @@ class OrderView extends View {
                     let rows = places.map(p => p.nextElementSibling)
                         .map(it => new RowDto(Number(it.getAttribute("data-id")), Number(it.innerText)));
                     let selectedDate = this.container.querySelector(".map-date.selected");
-                    let dto = new OrderDto();
+                    let dto = new NotExistsOrderDto();
                     dto.dateId = Number(selectedDate.getAttribute("data-id"));
                     dto.places = rows;
                     return await this.handler.handle(EVENT.COMMIT, dto);
@@ -192,6 +193,7 @@ class OrderView extends View {
 }
 
 const EVENT = {
+    MODEL: "o_m",
     MAP: "map",
     HALLS: "hall",
     CATEGORIES: "category",

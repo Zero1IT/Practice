@@ -75,6 +75,7 @@ public abstract class GenericJdbcRepository <K extends Serializable, T> implemen
             transaction(executor, connection);
         } catch (SQLException e) {
             LOGGER.error(e);
+            throw new DatabaseException(e);
         }
     }
 
@@ -142,11 +143,14 @@ public abstract class GenericJdbcRepository <K extends Serializable, T> implemen
     private <S extends T> Object constraintValue(Field field, S instance) {
         try {
             Object constraint = invokeGetter(field, instance);
+            if (constraint == null) {
+                return null;
+            }
             if (!constraint.getClass().isAnnotationPresent(Table.class)) {
                 throw new ForeignKeyException("Isn't annotated with table - " + constraint.getClass());
             }
             Field ref = constraint.getClass().getDeclaredField(field.getAnnotation(Constraint.class).mappedBy());
-            return invokeGetter(constraint.getClass(), ref, constraint);
+            return invokeGetter(ref, constraint);
         } catch (NoSuchFieldException e) {
             throw new ForeignKeyException("Constraint error, field not found - " + field);
         }
@@ -270,9 +274,23 @@ public abstract class GenericJdbcRepository <K extends Serializable, T> implemen
 
     @Override
     public long count() {
+        return calculateCount(StatementBuilder.getInstance().countRowsStatement(tableName), null);
+    }
+
+    public long countCondition(String columnName, Object val) {
+        return calculateCount(StatementBuilder.getInstance().countRowsWithConditionStatement(tableName, columnName), stm -> {
+                    stm.setObject(1, val);
+                    return stm;
+                });
+    }
+
+    public long calculateCount(String stm, PreparedStatementSetter setter) {
         AtomicLong result = new AtomicLong(0);
         executeAsTransaction(connection -> {
-            try (PreparedStatement statement = connection.prepareStatement(StatementBuilder.getInstance().countRowsStatement(tableName))) {
+            try (PreparedStatement statement = connection.prepareStatement(stm)) {
+                if (setter != null) {
+                    setter.apply(statement);
+                }
                 ResultSet resultSet = statement.executeQuery();
                 if (resultSet.next()) {
                     result.set(resultSet.getLong(1));
@@ -329,11 +347,17 @@ public abstract class GenericJdbcRepository <K extends Serializable, T> implemen
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     private Object createConstraint(Object instance, Field field, Object ref, Object ... constraints) {
+        if (ref == null) {
+            return null;
+        }
         Class<?> type = field.getType();
         String fieldConstraintName = field.getAnnotation(Constraint.class).mappedBy();
         if (constraints.length != 0) {
+            Field[] temp = new Field[1];
             Optional<Object> first = Arrays.stream(constraints)
-                    .filter(constraint -> constraint.getClass().equals(type))
+                    .filter(constraint -> constraint.getClass().equals(type)
+                            && (temp[0] = getConstraintObjectField(fieldConstraintName, constraint)) != null
+                            && invokeGetter(temp[0], constraint).equals(ref))
                     .findFirst();
             if (first.isPresent()) {
                 return first.get();
@@ -345,6 +369,15 @@ public abstract class GenericJdbcRepository <K extends Serializable, T> implemen
             return result.get(0);
         }
         throw new ForeignKeyException("Constraint error " + field.getName() + " for " + classInstance);
+    }
+
+    private static Field getConstraintObjectField(String fieldConstraintName, Object constraint) {
+        try {
+            return constraint.getClass().getDeclaredField(fieldConstraintName);
+        } catch (NoSuchFieldException e) {
+            LOGGER.error(e);
+            return null;
+        }
     }
 
     private void cacheMetaInfo() {
@@ -367,32 +400,27 @@ public abstract class GenericJdbcRepository <K extends Serializable, T> implemen
         }
     }
 
-    private Object invokeGetter(Class<?> cl, Field field, Object instance) {
+    private Object invokeGetter(Field field, Object instance) {
         try {
+            Class<?> cl = instance.getClass();
+            String prefix = field.getType().equals(Boolean.TYPE) ? "is" : "get";
             Method getter = getterCache.computeIfAbsent(field, f ->
-                    getBeanMethod(cl, f, "get", f.getType()));
+                    getBeanMethod(cl, f, prefix, f.getType()));
             return getter.invoke(instance);
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new InvalidMethodException(e);
         }
     }
 
-    private Object invokeGetter(Field field, Object instance) {
-        return invokeGetter(classInstance, field, instance);
-    }
-
-    private void invokeSetter(Class<?> cl, Field field, Object instance, Object value) {
-        Method setter = setterCache.computeIfAbsent(field, f ->
-                getBeanMethod(cl, f, "set", null, f.getType()));
+    private void invokeSetter(Field field, Object instance, Object value) {
         try {
+            Class<?> cl = instance.getClass();
+            Method setter = setterCache.computeIfAbsent(field, f ->
+                    getBeanMethod(cl, f, "set", null, f.getType()));
             setter.invoke(instance, value);
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new InvalidMethodException("Error - " + instance.getClass(), e);
         }
-    }
-
-    private void invokeSetter(Field field, Object instance, Object value) {
-        invokeSetter(classInstance, field, instance, value);
     }
 
     @NotNull
@@ -410,5 +438,9 @@ public abstract class GenericJdbcRepository <K extends Serializable, T> implemen
 
     public interface Executor {
         void execute(Connection connection) throws SQLException;
+    }
+
+    public interface PreparedStatementSetter {
+        PreparedStatement apply(PreparedStatement stm) throws SQLException;
     }
 }
